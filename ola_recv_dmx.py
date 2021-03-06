@@ -31,24 +31,22 @@ REWIND_CHANNEL=3
 PAUSE_CHANNEL=4
 RESUME_CHANNEL=5
 
+video_provider = None
 DMX=[]
 
 RATE_DELTA=0.05
 
-# vlc player
-media_player = vlc.MediaPlayer("--fullscreen ", "--no-audio", "--intf", "'--mouse-hide-timeout=0", "--video-on-top")
-media_player.set_fullscreen(True)
 # initialise empty list of channels
 current_dmx_channel = [0]*512
 args = []
 
 def init_dmx():
-    DMX=[[VIDEO_CHANNEL, play_video],
-        [RATE_CHANNEL, change_rate_video],
-        [RESET_RATE_CHANNEL, reset_rate_video],
-        [REWIND_CHANNEL, rewind_video],
-        [PAUSE_CHANNEL, pause_video],
-        [RESUME_CHANNEL, resume_video]]
+    DMX=[[VIDEO_CHANNEL, "play_video"],
+        [RATE_CHANNEL, "change_rate_video"],
+        [RESET_RATE_CHANNEL, "reset_rate_video"],
+        [REWIND_CHANNEL, "rewind_video"],
+        [PAUSE_CHANNEL, "pause_video"],
+        [RESUME_CHANNEL, "resume_video"]]
     return DMX
 
 class VideoProviderDir(object):
@@ -56,9 +54,15 @@ class VideoProviderDir(object):
         self._media_files = []
         self._rootpath = rootpath
         self._file_ext = file_ext
-        self._index = 0
 
-    def open(self):
+        # vlc player
+        self.media_player = vlc.MediaPlayer("--fullscreen ", "--no-audio", "--intf", "'--mouse-hide-timeout=0", "--video-on-top")
+        self.media_player.set_fullscreen(True)
+
+        # read files from dir
+        self.load_files()
+
+    def load_files(self):
         """
         this function is responsible of opening the media.
         it could have been done in the __init__, but it is just an example
@@ -83,7 +87,7 @@ class VideoProviderDir(object):
             print ("Video requeested: {:d}".format(n))
         # get source name
         try:
-            source = os.path.join(video_provider._rootpath, video_provider._media_files[n])
+            source = os.path.join(self._rootpath, self._media_files[n])
         except IndexError:
             print ("Video not found in position: {:d}".format(n))
             return
@@ -91,28 +95,28 @@ class VideoProviderDir(object):
         # create a media object
         media = vlc.Media(source)
         # set media to the media player
-        media_player.set_media(media)
+        self.media_player.set_media(media)
         # start playing video
-        media_player.play()
+        self.media_player.play()
 
     def change_rate_video(self, n):
-        rate = media_player.get_rate()
+        new_rate = rate = self.media_player.get_rate()
 
         # change rate
         if current_dmx_channel[RATE_CHANNEL] > n:
             new_rate = rate - RATE_DELTA
         elif current_dmx_channel[RATE_CHANNEL] < n:
             new_rate = rate + RATE_DELTA
-        media_player.set_rate(new_rate)
+        self.media_player.set_rate(new_rate)
 
         if args.verbosity:
             print ("Rate changed from {:f} to: {:f}".format(rate, new_rate))
 
     def reset_rate_video(self, n):
         if args.verbosity:
-            rate = media_player.get_rate()
+            rate = self.media_player.get_rate()
             print ("Video rate reset requeested: rate was {:f}".format(rate))
-        media_player.set_rate(1.0)
+        self.media_player.set_rate(1.0)
 
     def rewind_video(self, n):
         if args.verbosity:
@@ -120,29 +124,29 @@ class VideoProviderDir(object):
 
         # only rewind when value is zero
         if n == 0:
-            if media_player.get_state() != vlc.State.Ended:
-                media_player.set_position(0)
-                media_player.play()
+            if self.media_player.get_state() != vlc.State.Ended:
+                self.media_player.set_position(0)
+                self.media_player.play()
             else:
                 # replay video when finished as set_position does not work
                 # This works but closes and opens the player waindow
-                # media_player.stop()
-                # media_player.play()
+                # self.media_player.stop()
+                # self.media_player.play()
                 idx, func = DMX[VIDEO_CHANNEL]
-                func(current_dmx_channel[idx])
+                getattr(video_provider, func)(current_dmx_channel[idx])
 
     def pause_video(self, n):
         if args.verbosity:
-            if media_player.is_playing():
+            if self.media_player.is_playing():
                 print ("Video pause requeested {:d}".format(n))
             else:
                 print ("Video unpause requeested {:d}".format(n))
-        media_player.pause()
+        self.media_player.pause()
 
     def resume_video(self, n):
         if args.verbosity:
             print ("Video resume requeested {:d}".format(n))
-        media_player.play()
+        self.media_player.play()
 
 def newdata(data):
     global DMX
@@ -158,7 +162,7 @@ def newdata(data):
         try:
             # on change call function and update with new value when done
             if data[idx] != current_dmx_channel[idx]:
-                func(data[idx])
+                getattr(video_provider, func)(data[idx])
                 current_dmx_channel[idx] = data[idx]
         except IndexError:
             print ("Out of range channel requeested: {:d}".format(data[idx]))
@@ -190,7 +194,6 @@ def main():
 
     # and that the logic can be isolated from the callbacks
     video_provider = VideoProviderDir(args.media_folder)
-    video_provider.open()
 
     # listen for DMX512 values in the specified universe
     wrapper = ClientWrapper()
