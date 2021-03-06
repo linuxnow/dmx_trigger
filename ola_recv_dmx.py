@@ -1,66 +1,206 @@
 #!/usr/bin/env python
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-# ola_recv_dmx.py
-# Copyright (C) 2005 Simon Newton
+# -*- coding: utf-8 -*-
 
-"""Receive DMX data."""
+__author__ = "Pau Aliagas <linuxnow@gmail.com>"
 
-import getopt
-import textwrap
-import sys
+"""
+Create a playlist with videos from a folder sorted alphabetically.
+Then receive DMX data to control the video play.
+
+We receive an array of DMX channel values (max 512)
+Channel 0: video number
+Channel 1: faster/slower
+Channel 2: reset rate
+Channel 3: rewind (if value is zero)
+Channel 4: pause/unpause
+Channel 5: resume
+
+"""
+
+import argparse
+import os
+import vlc
 from ola.ClientWrapper import ClientWrapper
 
-__author__ = 'nomis52@gmail.com (Simon Newton)'
+valid_extensions = [".avi", ".gif", ".mkv", ".mov", ".mp4", ".jpg", ".jpeg", ".png"]
 
+VIDEO_CHANNEL=0
+RATE_CHANNEL=1
+RESET_RATE_CHANNEL=2
+REWIND_CHANNEL=3
+PAUSE_CHANNEL=4
+RESUME_CHANNEL=5
 
-def NewData(data):
-  print(data)
+DMX=[]
 
+RATE_DELTA=0.05
 
-def Usage():
-  print(textwrap.dedent("""
-  Usage: ola_recv_dmx.py --universe <universe>
+# vlc player
+media_player = vlc.MediaPlayer("--fullscreen ", "--no-audio", "--intf", "'--mouse-hide-timeout=0", "--video-on-top")
+media_player.set_fullscreen(True)
+# initialise empty list of channels
+current_dmx_channel = [0]*512
+args = []
 
-  Display the DXM512 data for the universe.
+def init_dmx():
+    DMX=[[VIDEO_CHANNEL, play_video],
+        [RATE_CHANNEL, change_rate_video],
+        [RESET_RATE_CHANNEL, reset_rate_video],
+        [REWIND_CHANNEL, rewind_video],
+        [PAUSE_CHANNEL, pause_video],
+        [RESUME_CHANNEL, resume_video]]
+    return DMX
 
-  -h, --help                Display this help message and exit.
-  -u, --universe <universe> Universe number."""))
+class VideoProviderDir(object):
+    def __init__(self, rootpath, file_ext=valid_extensions):
+        self._media_files = []
+        self._rootpath = rootpath
+        self._file_ext = file_ext
+        self._index = 0
+
+    def open(self):
+        """
+        this function is responsible of opening the media.
+        it could have been done in the __init__, but it is just an example
+
+        in this case it scan the specified folder, but it could also scan a
+        remote url or whatever you prefer.
+        """
+
+        if args.verbosity >= 2:
+            print("read file list")
+        self._media_files = [f for f in os.listdir(self._rootpath) if os.path.splitext(f)[1] in self._file_ext]
+        self._media_files.sort()
+
+        if args.verbosity >= 2:
+            print("playlist:")
+        for index, media_file in enumerate(self._media_files):
+            if args.verbosity >= 2:
+                print(f"[{index}] {media_file}")
+
+    def play_video(self, n):
+        if args.verbosity:
+            print ("Video requeested: {:d}".format(n))
+        # get source name
+        try:
+            source = os.path.join(video_provider._rootpath, video_provider._media_files[n])
+        except IndexError:
+            print ("Video not found in position: {:d}".format(n))
+            return
+
+        # create a media object
+        media = vlc.Media(source)
+        # set media to the media player
+        media_player.set_media(media)
+        # start playing video
+        media_player.play()
+
+    def change_rate_video(self, n):
+        rate = media_player.get_rate()
+
+        # change rate
+        if current_dmx_channel[RATE_CHANNEL] > n:
+            new_rate = rate - RATE_DELTA
+        elif current_dmx_channel[RATE_CHANNEL] < n:
+            new_rate = rate + RATE_DELTA
+        media_player.set_rate(new_rate)
+
+        if args.verbosity:
+            print ("Rate changed from {:f} to: {:f}".format(rate, new_rate))
+
+    def reset_rate_video(self, n):
+        if args.verbosity:
+            rate = media_player.get_rate()
+            print ("Video rate reset requeested: rate was {:f}".format(rate))
+        media_player.set_rate(1.0)
+
+    def rewind_video(self, n):
+        if args.verbosity:
+            print ("Video rewind requeested {:d}".format(n))
+
+        # only rewind when value is zero
+        if n == 0:
+            if media_player.get_state() != vlc.State.Ended:
+                media_player.set_position(0)
+                media_player.play()
+            else:
+                # replay video when finished as set_position does not work
+                # This works but closes and opens the player waindow
+                # media_player.stop()
+                # media_player.play()
+                idx, func = DMX[VIDEO_CHANNEL]
+                func(current_dmx_channel[idx])
+
+    def pause_video(self, n):
+        if args.verbosity:
+            if media_player.is_playing():
+                print ("Video pause requeested {:d}".format(n))
+            else:
+                print ("Video unpause requeested {:d}".format(n))
+        media_player.pause()
+
+    def resume_video(self, n):
+        if args.verbosity:
+            print ("Video resume requeested {:d}".format(n))
+        media_player.play()
+
+def newdata(data):
+    global DMX
+    global current_dmx_channel
+
+    if args.verbosity >= 2:
+        print(data)
+
+    # check monitored channels
+    DMX= init_dmx()
+    for c in DMX:
+        idx, func = c
+        try:
+            # on change call function and update with new value when done
+            if data[idx] != current_dmx_channel[idx]:
+                func(data[idx])
+                current_dmx_channel[idx] = data[idx]
+        except IndexError:
+            print ("Out of range channel requeested: {:d}".format(data[idx]))
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+            description="Make files found in specified media folder (in alphabetic order) available to the specified universe.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+            "media_folder",
+            help="Where to find files to play")
+    parser.add_argument(
+            "-u", "--universe",
+            type=int, default=1,
+            help="Universe number).")
+    parser.add_argument(
+            '--extension',
+            default='ts',
+            help="file extension of the files to play")
+    parser.add_argument("-v", "--verbosity", action="count",default=0,
+           help="increase output verbosity")
+    return(parser.parse_args())
 
 
 def main():
-  try:
-      opts, args = getopt.getopt(sys.argv[1:], "hu:", ["help", "universe="])
-  except getopt.GetoptError as err:
-    print(str(err))
-    Usage()
-    sys.exit(2)
+    global args, video_provider
+    # read caommand line args
+    args = parse_args()
 
-  universe = 1
-  for o, a in opts:
-    if o in ("-h", "--help"):
-      Usage()
-      sys.exit()
-    elif o in ("-u", "--universe"):
-      universe = int(a)
+    # and that the logic can be isolated from the callbacks
+    video_provider = VideoProviderDir(args.media_folder)
+    video_provider.open()
 
-  wrapper = ClientWrapper()
-  client = wrapper.Client()
-  client.RegisterUniverse(universe, client.REGISTER, NewData)
-  wrapper.Run()
+    # listen for DMX512 values in the specified universe
+    wrapper = ClientWrapper()
+    client = wrapper.Client()
+    client.RegisterUniverse(args.universe, client.REGISTER, newdata)
+    wrapper.Run()
 
 
 if __name__ == "__main__":
-  main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Bye!")
