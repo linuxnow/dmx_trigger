@@ -106,9 +106,10 @@ class VideoProviderDir(object):
             if args.verbosity >= 2:
                 print(f"[{index}] {media_file}")
 
-    def play_video(self, n):
+    def _load_media(self, n, reset_rate=True):
         if args.verbosity:
-            print ("Video requeested: {:d}".format(n))
+            print ("Video load requeested: {:d}".format(n))
+
         # get source name
         try:
             source = os.path.join(self._rootpath, self._media_files[n])
@@ -120,12 +121,23 @@ class VideoProviderDir(object):
         media = vlc.Media(source)
         # set media to the media player
         self.media_player.set_media(media)
+        # update current video
+        self._current_video = n
+        # reset rate
+        if reset_rate:
+            self.reset_rate_video(n)
+
+    def play_video(self, n, load=True, reset_rate=True):
+        if args.verbosity:
+            print ("Video requeested: {:d}".format(n))
+        # load_media
+        if load:
+            self._load_media(n, reset_rate)
         # start playing video
         self.media_player.play()
 
-        # update current video and reset rate
-        self._current_video = n
-        self.reset_rate_video(n)
+        if args.verbosity >= 2:
+            print ("Started video: {:d}".format(n))
 
     def change_rate_video(self, n):
         new_rate = rate = self.media_player.get_rate()
@@ -143,10 +155,13 @@ class VideoProviderDir(object):
             print ("Rate changed from {:f} to: {:f}".format(rate, new_rate))
 
     def reset_rate_video(self, n):
+        reset_rate = 1.0
         if args.verbosity:
             rate = self.media_player.get_rate()
             print ("Video rate reset requeested: rate was {:f}".format(rate))
-        self.media_player.set_rate(1.0)
+        self.media_player.set_rate(reset_rate)
+        # update current rate
+        self._current_rate = reset_rate
 
     def rewind_video(self, n):
         if args.verbosity:
@@ -156,16 +171,15 @@ class VideoProviderDir(object):
         if n == 0:
             if self.media_player.get_state() != vlc.State.Ended:
                 self.media_player.set_position(0)
-                self.media_player.play()
+                load = False
+                # if video hasn't ended, keep rate
+                reset_rate=False
             else:
-                # replay video when finished as set_position does not work
-
-                # This works but closes and opens the player waindow
-                # self.media_player.stop()
-                # self.media_player.play()
-
-                # We play the video as new
-                self.play_video(self._current_video)
+                # reload video when finished as set_position does not work
+                load = True
+                # if video hss ended, reset rate
+                reset_rate=True
+            self.play_video(self._current_video, load=load, reset_rate=reset_rate)
 
     def pause_video(self, n):
         if args.verbosity:
@@ -198,7 +212,6 @@ def parse_args():
     parser.add_argument("-v", "--verbosity", action="count",default=0,
            help="increase output verbosity")
     return(parser.parse_args())
-
 
 def main():
     global args
