@@ -31,23 +31,47 @@ REWIND_CHANNEL=3
 PAUSE_CHANNEL=4
 RESUME_CHANNEL=5
 
-video_provider = None
-DMX=[]
+DMX=[[VIDEO_CHANNEL, "play_video"],
+    [RATE_CHANNEL, "change_rate_video"],
+    [RESET_RATE_CHANNEL, "reset_rate_video"],
+    [REWIND_CHANNEL, "rewind_video"],
+    [PAUSE_CHANNEL, "pause_video"],
+    [RESUME_CHANNEL, "resume_video"]]
 
+video_provider = None
 RATE_DELTA=0.05
 
 # initialise empty list of channels
 current_dmx_channel = [0]*512
 args = []
 
-def init_dmx():
-    DMX=[[VIDEO_CHANNEL, "play_video"],
-        [RATE_CHANNEL, "change_rate_video"],
-        [RESET_RATE_CHANNEL, "reset_rate_video"],
-        [REWIND_CHANNEL, "rewind_video"],
-        [PAUSE_CHANNEL, "pause_video"],
-        [RESUME_CHANNEL, "resume_video"]]
-    return DMX
+class DMX512Monitor(object):
+    def __init__(self, universe, dmx):
+        self._universe = universe
+        self.dmx = dmx
+
+    def newdata(self, data):
+        global current_dmx_channel
+
+        if args.verbosity >= 2:
+            print(data)
+
+        # check monitored channels
+        for c in self.dmx:
+            idx, func = c
+            try:
+                # on change call function and update with new value when done
+                if data[idx] != current_dmx_channel[idx]:
+                    getattr(video_provider, func)(data[idx])
+                    current_dmx_channel[idx] = data[idx]
+            except IndexError:
+                print ("Out of range channel requeested: {:d}".format(data[idx]))
+
+    def run(self):
+        wrapper = ClientWrapper()
+        client = wrapper.Client()
+        client.RegisterUniverse(self._universe, client.REGISTER, self.newdata)
+        wrapper.Run()
 
 class VideoProviderDir(object):
     def __init__(self, rootpath, file_ext=valid_extensions):
@@ -129,11 +153,13 @@ class VideoProviderDir(object):
                 self.media_player.play()
             else:
                 # replay video when finished as set_position does not work
+
                 # This works but closes and opens the player waindow
                 # self.media_player.stop()
                 # self.media_player.play()
-                idx, func = DMX[VIDEO_CHANNEL]
-                getattr(video_provider, func)(current_dmx_channel[idx])
+
+                # We play the video as new
+                self.play_video(current_dmx_channel[idx])
 
     def pause_video(self, n):
         if args.verbosity:
@@ -147,25 +173,6 @@ class VideoProviderDir(object):
         if args.verbosity:
             print ("Video resume requeested {:d}".format(n))
         self.media_player.play()
-
-def newdata(data):
-    global DMX
-    global current_dmx_channel
-
-    if args.verbosity >= 2:
-        print(data)
-
-    # check monitored channels
-    DMX= init_dmx()
-    for c in DMX:
-        idx, func = c
-        try:
-            # on change call function and update with new value when done
-            if data[idx] != current_dmx_channel[idx]:
-                getattr(video_provider, func)(data[idx])
-                current_dmx_channel[idx] = data[idx]
-        except IndexError:
-            print ("Out of range channel requeested: {:d}".format(data[idx]))
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -192,14 +199,12 @@ def main():
     # read caommand line args
     args = parse_args()
 
-    # and that the logic can be isolated from the callbacks
+    # setup the video provider
     video_provider = VideoProviderDir(args.media_folder)
 
     # listen for DMX512 values in the specified universe
-    wrapper = ClientWrapper()
-    client = wrapper.Client()
-    client.RegisterUniverse(args.universe, client.REGISTER, newdata)
-    wrapper.Run()
+    dmx_monitor = DMX512Monitor(args.universe, DMX)
+    dmx_monitor.run()
 
 
 if __name__ == "__main__":
