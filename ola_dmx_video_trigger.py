@@ -31,7 +31,7 @@ REWIND_CHANNEL=3
 PAUSE_CHANNEL=4
 RESUME_CHANNEL=5
 
-DMX=[[VIDEO_CHANNEL, "play_video"],
+DMX_TRIGGER=[[VIDEO_CHANNEL, "play_video"],
     [RATE_CHANNEL, "change_rate_video"],
     [RESET_RATE_CHANNEL, "reset_rate_video"],
     [REWIND_CHANNEL, "rewind_video"],
@@ -41,29 +41,27 @@ DMX=[[VIDEO_CHANNEL, "play_video"],
 video_provider = None
 RATE_DELTA=0.05
 
-# initialise empty list of channels
-current_dmx_channel = [0]*512
 args = []
 
 class DMX512Monitor(object):
-    def __init__(self, universe, dmx):
+    def __init__(self, universe, dmx_trigger):
         self._universe = universe
-        self.dmx = dmx
+        self.dmx_trigger = dmx_trigger
+        # initialise empty list of channels
+        self.dmx_channel = [0]*512
 
     def newdata(self, data):
-        global current_dmx_channel
-
         if args.verbosity >= 2:
             print(data)
 
         # check monitored channels
-        for c in self.dmx:
+        for c in self.dmx_trigger:
             idx, func = c
             try:
                 # on change call function and update with new value when done
-                if data[idx] != current_dmx_channel[idx]:
+                if data[idx] != self.dmx_channel[idx]:
                     getattr(video_provider, func)(data[idx])
-                    current_dmx_channel[idx] = data[idx]
+                    self.dmx_channel[idx] = data[idx]
             except IndexError:
                 print ("Out of range channel requeested: {:d}".format(data[idx]))
 
@@ -78,6 +76,8 @@ class VideoProviderDir(object):
         self._media_files = []
         self._rootpath = rootpath
         self._file_ext = file_ext
+        self._current_video = 0
+        self._current_rate = 0
 
         # vlc player
         self.media_player = vlc.MediaPlayer("--fullscreen ", "--no-audio", "--intf", "'--mouse-hide-timeout=0", "--video-on-top")
@@ -123,15 +123,21 @@ class VideoProviderDir(object):
         # start playing video
         self.media_player.play()
 
+        # update current video and reset rate
+        self._current_video = n
+        self.reset_rate_video(n)
+
     def change_rate_video(self, n):
         new_rate = rate = self.media_player.get_rate()
 
         # change rate
-        if current_dmx_channel[RATE_CHANNEL] > n:
+        if self._current_rate > n:
             new_rate = rate - RATE_DELTA
-        elif current_dmx_channel[RATE_CHANNEL] < n:
+        elif self._current_rate < n:
             new_rate = rate + RATE_DELTA
         self.media_player.set_rate(new_rate)
+        # update current rate
+        self._current_rate = n
 
         if args.verbosity:
             print ("Rate changed from {:f} to: {:f}".format(rate, new_rate))
@@ -159,7 +165,7 @@ class VideoProviderDir(object):
                 # self.media_player.play()
 
                 # We play the video as new
-                self.play_video(current_dmx_channel[idx])
+                self.play_video(self._current_video)
 
     def pause_video(self, n):
         if args.verbosity:
@@ -203,7 +209,7 @@ def main():
     video_provider = VideoProviderDir(args.media_folder)
 
     # listen for DMX512 values in the specified universe
-    dmx_monitor = DMX512Monitor(args.universe, DMX)
+    dmx_monitor = DMX512Monitor(args.universe, DMX_TRIGGER)
     dmx_monitor.run()
 
 
