@@ -38,15 +38,15 @@ DMX_TRIGGER=[[VIDEO_CHANNEL, "play_video"],
     [PAUSE_CHANNEL, "pause_video"],
     [RESUME_CHANNEL, "resume_video"]]
 
-video_provider = None
 RATE_DELTA=0.05
 
 args = []
 
 class DMX512Monitor(object):
-    def __init__(self, universe, dmx_trigger):
+    def __init__(self, universe, dmx_trigger, video_provider):
         self._universe = universe
         self.dmx_trigger = dmx_trigger
+        self.video_provider = video_provider
         # initialise empty list of channels
         self.dmx_channel = [0]*512
 
@@ -60,7 +60,7 @@ class DMX512Monitor(object):
             try:
                 # on change call function and update with new value when done
                 if data[idx] != self.dmx_channel[idx]:
-                    getattr(video_provider, func)(data[idx])
+                    getattr(self.video_provider, func)(data[idx])
                     self.dmx_channel[idx] = data[idx]
             except IndexError:
                 print ("Out of range channel requeested: {:d}".format(data[idx]))
@@ -201,7 +201,7 @@ def parse_args():
 
 
 def main():
-    global args, video_provider
+    global args
     # read caommand line args
     args = parse_args()
 
@@ -209,7 +209,7 @@ def main():
     video_provider = VideoProviderDir(args.media_folder)
 
     # listen for DMX512 values in the specified universe
-    dmx_monitor = DMX512Monitor(args.universe, DMX_TRIGGER)
+    dmx_monitor = DMX512Monitor(args.universe, DMX_TRIGGER, video_provider)
     dmx_monitor.run()
 
 
