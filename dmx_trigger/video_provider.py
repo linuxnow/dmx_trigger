@@ -16,17 +16,19 @@ valid_extensions = [".avi", ".gif", ".mkv", ".mov", ".mp4", ".jpg", ".jpeg", ".p
 RATE_DELTA=0.05
 
 class VLCVideoProviderDir(object):
-    def __init__(self, rootpath, file_ext=valid_extensions, verbosity=0):
+    def __init__(self, rootpath, file_ext=valid_extensions, volume=0, verbosity=0):
         self._media_files = []
         self._rootpath = rootpath
         self._file_ext = file_ext
         self._verbosity = verbosity
         self._current_video = 0
         self._current_rate = 0
+        self._volume = volume
 
         # vlc player
         self.media_player = vlc.MediaPlayer("--fullscreen ", "--no-audio", "--intf", "'--mouse-hide-timeout=0", "--video-on-top")
         self.media_player.set_fullscreen(True)
+        self.media_player.audio_set_volume(self._volume)
 
         # read files from dir
         self.load_files()

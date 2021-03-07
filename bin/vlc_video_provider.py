@@ -19,8 +19,8 @@ Channel 5: resume
 
 import argparse
 
-from dmx_monitor import DMX512Monitor, DMX_CALLBACK
-from video_provider import VLCVideoProviderDir
+from dmx_trigger.dmx_monitor import DMX512Monitor, DMX_CALLBACK
+from dmx_trigger.video_provider import VLCVideoProviderDir
 
 def parse_args():
     parser = argparse.ArgumentParser(
