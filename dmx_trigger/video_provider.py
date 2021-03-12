@@ -51,11 +51,11 @@ class VLCVideoProviderDir(object):
             print("playlist:")
         for index, media_file in enumerate(self._media_files):
             if self._verbosity >= 2:
-                print("[{index}] {media_file}")
+                print(index, media_file)
 
     def _load_media(self, n, reset_rate=True):
         if self._verbosity:
-            print ("Video load requeested: {:d}".format(n))
+            print ("Video load requested: {:d}".format(n))
 
         # get source name
         try:
@@ -76,7 +76,7 @@ class VLCVideoProviderDir(object):
 
     def play_video(self, n, load=True, reset_rate=True):
         if self._verbosity:
-            print ("Video requeested: {:d}".format(n))
+            print ("Video requested: {:d}".format(n))
         # load_media
         if load:
             self._load_media(n, reset_rate)
@@ -105,14 +105,14 @@ class VLCVideoProviderDir(object):
         reset_rate = 1.0
         if self._verbosity:
             rate = self.media_player.get_rate()
-            print ("Video rate reset requeested: rate was {:f}".format(rate))
+            print ("Video rate reset requested: rate was {:f}".format(rate))
         self.media_player.set_rate(reset_rate)
         # update current rate
         self._current_rate = reset_rate
 
     def rewind_video(self, n):
         if self._verbosity:
-            print ("Video rewind requeested {:d}".format(n))
+            print ("Video rewind requested {:d}".format(n))
 
         # only rewind when value is zero
         if n == 0:
@@ -131,12 +131,12 @@ class VLCVideoProviderDir(object):
     def pause_video(self, n):
         if self._verbosity:
             if self.media_player.is_playing():
-                print ("Video pause requeested {:d}".format(n))
+                print ("Video pause requested {:d}".format(n))
             else:
-                print ("Video unpause requeested {:d}".format(n))
+                print ("Video unpause requested {:d}".format(n))
         self.media_player.pause()
 
     def resume_video(self, n):
         if self._verbosity:
-            print ("Video resume requeested {:d}".format(n))
+            print ("Video resume requested {:d}".format(n))
         self.media_player.play()

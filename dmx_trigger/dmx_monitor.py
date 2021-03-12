@@ -48,16 +48,19 @@ class DMX512Monitor(object):
         if self._verbosity >= 2:
             print(data)
 
-        # check monitored channels and trigger callbacks
+        # check data for monitored channels only and trigger callbacks
         for c in self.dmx_cb:
             idx, func = c
             try:
                 # on change call function and update with new value when done
                 if data[idx] != self.dmx_channel[idx]:
-                    getattr(self.video_provider, func)(data[idx])
+                    if self._verbosity >= 2:
+                        getattr(self.video_provider, func)(data[idx])
                     self.dmx_channel[idx] = data[idx]
             except IndexError:
-                print ("Out of range channel requeested: {:d}".format(data[idx]))
+                # either we have a bad channel or we have iterated data
+                # print ("Out of range channel requested: {:d}".format(idx))
+                break
 
     def run(self):
         wrapper = ClientWrapper()
