@@ -51,7 +51,7 @@ class VLCVideoProviderDir(object):
             print("playlist:")
         for index, media_file in enumerate(self._media_files):
             if self._verbosity >= 2:
-                print(f"[{index}] {media_file}")
+                print("[{index}] {media_file}")
 
     def _load_media(self, n, reset_rate=True):
         if self._verbosity:
