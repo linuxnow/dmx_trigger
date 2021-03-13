@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = "Pau Aliagas <linuxnow@gmail.com>"
-
 """
 Receive DMX data from olad.
 
@@ -16,10 +14,18 @@ Channel 2: reset rate
 Channel 3: rewind (if value is zero)
 Channel 4: pause/unpause
 Channel 5: resume
-
 """
 
+__author__ = "Pau Aliagas <linuxnow@gmail.com>"
+__copyright__ = "Copyright (c) 2021 Pau Aliagas"
+__license__ = "GPL 3.0"
+__all__ = ['DMX512Monitor']
+
+import logging
 from ola.ClientWrapper import ClientWrapper
+
+logger = logging.getLogger(__name__)
+
 
 VIDEO_CHANNEL=0
 RATE_CHANNEL=1
@@ -36,17 +42,16 @@ DMX_CALLBACK=[[VIDEO_CHANNEL, "play_video"],
     [RESUME_CHANNEL, "resume_video"]]
 
 class DMX512Monitor(object):
-    def __init__(self, universe, dmx_cb, video_provider, log_level=0):
+    def __init__(self, universe, dmx_cb, video_provider):
         self._universe = universe
         self.dmx_cb = dmx_cb
         self.video_provider = video_provider
-        self._log_level = log_level
         # initialise empty list of channels
-        self.dmx_channel = [0]*512
+        self.dmx_channel = [None]*512
 
     def newdata(self, data):
-        if self._log_level >= 3:
-            print(data)
+        # too much noise
+        # logger.debug(data)
 
         # check data for monitored channels only and trigger callbacks
         for c in self.dmx_cb:
@@ -54,13 +59,11 @@ class DMX512Monitor(object):
             try:
                 # on change call function and update with new value when done
                 if data[idx] != self.dmx_channel[idx]:
-                    if self._log_level >= 2:
-                        print ("Request change channel {} value from {} to {}".format(idx, self.dmx_channel[idx], data[idx]))
-                    getattr(self.video_provider, func)(data[idx])
+                    logger.info("Request change channel {} value from {} to {}".format(idx, self.dmx_channel[idx], data[idx]))
+                    getattr(self.video_provider, func)(data[idx], current=self.dmx_channel[idx])
                     self.dmx_channel[idx] = data[idx]
             except IndexError:
                 # either we have a bad channel or we have iterated data
-                # print ("Out of range channel requested: {:d}".format(idx))
                 break
 
     def run(self):

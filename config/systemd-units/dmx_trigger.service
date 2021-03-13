@@ -1,0 +1,22 @@
+[Unit]
+Description=DMX Video Trigger Concert
+After=syslog.target network.target multi-user.target gnome.service olad.service
+Requires=graphical-session.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/dmx_trigger/dmx_trigger.conf
+
+Environment=ICON=/usr/share/icons/Adwaita/scalable/mimetypes/video-x-generic-symbolic.svg
+
+ExecStartPre=notify-send "Starting dmx_trigger service."
+
+ExecStart=%h/.local/bin/vlc_video_provider.py $MEDIA_DIR -u $UNIVERSE --config $CONFIG_FILE
+Restart=always
+RestartSec=3
+
+ExecStopPost=-bash -c '[[ $EXIT_STATUS == 0 ]] && notify-send "dmx_trigger service finished successfully."'
+ExecStopPost=-bash -c '[[ $EXIT_STATUS != 0 ]] && notify-send "dmx_trigger service finished abnormally."'
+
+[Install]
+WantedBy=multi-user.target olad.service graphical-session.target

@@ -1,28 +1,32 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = "Pau Aliagas <linuxnow@gmail.com>"
-
 """
 Create a playlist with videos from a folder sorted alphabetically
 and provide control with classs methods.
-
 """
 
+__author__ = "Pau Aliagas <linuxnow@gmail.com>"
+__copyright__ = "Copyright (c) 2021 Pau Aliagas"
+__license__ = "GPL 3.0"
+__all__ = ['VLCVideoProviderDir']
+
+import logging
 import os
 import vlc
+
+logger = logging.getLogger(__name__)
 
 valid_extensions = [".avi", ".gif", ".mkv", ".mov", ".mp4", ".jpg", ".jpeg", ".png"]
 RATE_DELTA=0.05
 
 class VLCVideoProviderDir(object):
-    def __init__(self, rootpath, file_ext=valid_extensions, volume=0, log_level=0):
+    def __init__(self, rootpath, file_ext=valid_extensions, volume=0):
         self._media_files = []
         self._rootpath = rootpath
         self._file_ext = file_ext
-        self._log_level = log_level
         self._current_video = 0
-        self._current_rate = 0
+        self._current_rate = 1
         self._volume = volume
 
         # vlc player
@@ -42,26 +46,22 @@ class VLCVideoProviderDir(object):
         remote url or whatever you prefer.
         """
 
-        if self._log_level >= 2:
-            print("read file list")
+        logger.debug("read file list")
         self._media_files = [f for f in os.listdir(self._rootpath) if os.path.splitext(f)[1] in self._file_ext]
         self._media_files.sort()
 
-        if self._log_level >= 2:
-            print("playlist:")
+        logger.debug("playlist:")
         for index, media_file in enumerate(self._media_files):
-            if self._log_level >= 2:
-                print(index, media_file)
+            logger.debug("{}: {}".format(index, media_file))
 
     def _load_media(self, n, reset_rate=True):
-        if self._log_level:
-            print ("Video load requested: {:d}".format(n))
+        logger.debug("Video load requested: {:d}".format(n))
 
         # get source name
         try:
             source = os.path.join(self._rootpath, self._media_files[n])
         except IndexError:
-            print ("Video not found in position: {:d}".format(n))
+            logger.warning("Video not found in position: {:d}".format(n))
             return
 
         # create a media object
@@ -74,19 +74,22 @@ class VLCVideoProviderDir(object):
         if reset_rate:
             self.reset_rate_video(n)
 
-    def play_video(self, n, load=True, reset_rate=True):
-        if self._log_level:
-            print ("Video requested: {:d}".format(n))
+    def play_video(self, n, current=None, load=True, reset_rate=True):
+        logger.info("Video requested: {:d}".format(n))
         # load_media
         if load:
             self._load_media(n, reset_rate)
         # start playing video
         self.media_player.play()
 
-        if self._log_level >= 2:
-            print ("Started video: {:d}".format(n))
+        logger.debug("Started video:: {:d}".format(n))
 
-    def change_rate_video(self, n):
+    def change_rate_video(self, n, current=None):
+        # ignore initial rate change
+        if current is None:
+            logger.debug("Initial rate change ignored.")
+            return
+
         new_rate = rate = self.media_player.get_rate()
 
         # change rate
@@ -98,21 +101,22 @@ class VLCVideoProviderDir(object):
         # update current rate
         self._current_rate = n
 
-        if self._log_level:
-            print ("Rate changed from {:f} to: {:f}".format(rate, new_rate))
+        logger.info("Rate changed from {:f} to: {:f}".format(rate, new_rate))
 
-    def reset_rate_video(self, n):
+    def reset_rate_video(self, n, current=None):
         reset_rate = 1.0
-        if self._log_level:
-            rate = self.media_player.get_rate()
-            print ("Video rate reset requested: rate was {:f}".format(rate))
+        logger.info("Video rate reset requested: rate was {:f}".format(self.media_player.get_rate()))
         self.media_player.set_rate(reset_rate)
         # update current rate
         self._current_rate = reset_rate
 
-    def rewind_video(self, n):
-        if self._log_level:
-            print ("Video rewind requested {:d}".format(n))
+    def rewind_video(self, n, current=None):
+        # ignore initial rewind
+        if current is None:
+            logger.debug("Initial rewaind ignored.")
+            return
+
+        logger.info("Video rewind requested {:d}".format(n))
 
         # only rewind when value is zero
         if n == 0:
@@ -128,15 +132,18 @@ class VLCVideoProviderDir(object):
                 reset_rate=True
             self.play_video(self._current_video, load=load, reset_rate=reset_rate)
 
-    def pause_video(self, n):
-        if self._log_level:
-            if self.media_player.is_playing():
-                print ("Video pause requested {:d}".format(n))
-            else:
-                print ("Video unpause requested {:d}".format(n))
+    def pause_video(self, n, current=None):
+        # ignore initial pause
+        if current is None:
+            logger.debug("Initial pause ignored.")
+            return
+
+        if self.media_player.is_playing():
+            logger.info("Video pause requested {:d}".format(n))
+        else:
+            logger.info("Video unpause requested {:d}".format(n))
         self.media_player.pause()
 
-    def resume_video(self, n):
-        if self._log_level:
-            print ("Video resume requested {:d}".format(n))
+    def resume_video(self, n, current=None):
+        logger.info("Video resume requested {:d}".format(n))
         self.media_player.play()

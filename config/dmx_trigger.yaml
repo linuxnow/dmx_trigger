@@ -1,0 +1,60 @@
+---
+# we can add env vars
+# environment:
+    # env_var = value
+
+# logging can be overriden in each section
+loggers:
+    # file: "~/.config/dmx_trigger/dmx_trigger_loggers.yaml"
+    # file: "~/.config/dmx_trigger/dmx_trigger_loggers.conf"
+    # embedded config has priority
+    config:
+        version: 1
+        objects:
+          queue:
+            class: multiprocessing.Queue
+            maxsize: 10000
+        formatters:
+          simple:
+            format: "%(asctime)s %(name)s: %(levelname)s: %(message)s"
+        handlers:
+          console:
+            class: logging.StreamHandler
+            level: DEBUG
+            formatter: simple
+            stream: ext://sys.stdout
+          queue_listener:
+            class: dmx_trigger.utils.queue_listener_handler.QueueListenerHandler
+            handlers:
+              - cfg://handlers.console
+            queue: cfg://objects.queue
+            level: DEBUG
+            formatter: simple
+        loggers:
+          dmx_trigger:
+            level: DEBUG
+            handlers:
+              - queue_listener
+            propagate: no
+          __main__:
+            level: DEBUG
+            handlers:
+              - queue_listener
+            propagate: no
+        root:
+          level: WARN
+          handlers:
+              - console
+
+# we can also embed the loggers configuration in this file
+# loggers:
+
+# default values
+universe: 0
+
+VIDEO_CHANNEL: 0
+RATE_CHANNEL: 1
+RESET_RATE_CHANNEL: 2
+REWIND_CHANNEL: 3
+PAUSE_CHANNEL: 4
+RESUME_CHANNEL: 5

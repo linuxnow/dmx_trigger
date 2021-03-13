@@ -1,0 +1,52 @@
+Start daemons as systemd units.
+
+1. Create units
+---------------
+# sysemd units for olad and dmx_trigger
+mkdir -p ~/.config/systemd/user
+cp *.service ~/.config/systemd/user
+
+# config in a separate config 
+mkdir ~/.config/dmx_trigger/
+cp dmx_trigger_concert.conf ~/.config/dmx_trigger/
+
+We can have several dmx_triggers units listening in different universes.
+This way we can have a universe for concert videos and another for dance.
+
+2. Install
+# if we install olad with an rpm/deb we can remove the --user part
+systemctl --user enable --now olad
+systemctl --user start  olad
+systemctl --user enable --now dmx_trigger_concert
+systemctl --user start dmx_trigger_concert
+
+3. Manage units
+systemctl --user start dmx_trigger_concert
+
+4. Start
+Unit files are configured to be autoamtically started:
+-olad: when we reach network and multi_user target
+-dmx_trigger_concert when we reach olad and graphic.session
+
+As dmx_triggers starts videos, it needs not only a grapical target but a session for the user.
+
+2. Patching
+olad provides devices (ArtNet, E1.31, OSC) and ports for each device.
+We have to bind an ArtNet port ot our universe.
+
+$ ola_dev_info
+Device 2: ArtNet [192.168.1.11]
+  port 0, IN, priority 100, RDM supported
+  port 1, IN, priority 100, RDM supported
+  port 2, IN, priority 100, RDM supported
+  port 3, IN, priority 100, RDM supported
+  port 0, OUT, RDM supported
+  port 1, OUT, RDM supported
+  port 2, OUT, RDM supported
+  port 3, OUT, RDM supported
+
+# We choose ArtNEt (Device -2) and an inpùt device (-i)
+# We patch universe 5 to port 0
+$ ola_patch -d 2 -p 0 -i -u 5
+# We patch universe 6 to port 1
+$ ola_patch -d 2 -p 1 -i -u 5
