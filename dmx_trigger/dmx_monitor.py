@@ -36,16 +36,16 @@ DMX_CALLBACK=[[VIDEO_CHANNEL, "play_video"],
     [RESUME_CHANNEL, "resume_video"]]
 
 class DMX512Monitor(object):
-    def __init__(self, universe, dmx_cb, video_provider, verbosity=0):
+    def __init__(self, universe, dmx_cb, video_provider, log_level=0):
         self._universe = universe
         self.dmx_cb = dmx_cb
         self.video_provider = video_provider
-        self._verbosity = verbosity
+        self._log_level = log_level
         # initialise empty list of channels
         self.dmx_channel = [0]*512
 
     def newdata(self, data):
-        if self._verbosity >= 2:
+        if self._log_level >= 3:
             print(data)
 
         # check data for monitored channels only and trigger callbacks
@@ -54,8 +54,9 @@ class DMX512Monitor(object):
             try:
                 # on change call function and update with new value when done
                 if data[idx] != self.dmx_channel[idx]:
-                    if self._verbosity >= 2:
-                        getattr(self.video_provider, func)(data[idx])
+                    if self._log_level >= 2:
+                        print ("Request change channel {} value from {} to {}".format(idx, self.dmx_channel[idx], data[idx]))
+                    getattr(self.video_provider, func)(data[idx])
                     self.dmx_channel[idx] = data[idx]
             except IndexError:
                 # either we have a bad channel or we have iterated data

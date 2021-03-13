@@ -16,11 +16,11 @@ valid_extensions = [".avi", ".gif", ".mkv", ".mov", ".mp4", ".jpg", ".jpeg", ".p
 RATE_DELTA=0.05
 
 class VLCVideoProviderDir(object):
-    def __init__(self, rootpath, file_ext=valid_extensions, volume=0, verbosity=0):
+    def __init__(self, rootpath, file_ext=valid_extensions, volume=0, log_level=0):
         self._media_files = []
         self._rootpath = rootpath
         self._file_ext = file_ext
-        self._verbosity = verbosity
+        self._log_level = log_level
         self._current_video = 0
         self._current_rate = 0
         self._volume = volume
@@ -42,19 +42,19 @@ class VLCVideoProviderDir(object):
         remote url or whatever you prefer.
         """
 
-        if self._verbosity >= 2:
+        if self._log_level >= 2:
             print("read file list")
         self._media_files = [f for f in os.listdir(self._rootpath) if os.path.splitext(f)[1] in self._file_ext]
         self._media_files.sort()
 
-        if self._verbosity >= 2:
+        if self._log_level >= 2:
             print("playlist:")
         for index, media_file in enumerate(self._media_files):
-            if self._verbosity >= 2:
+            if self._log_level >= 2:
                 print(index, media_file)
 
     def _load_media(self, n, reset_rate=True):
-        if self._verbosity:
+        if self._log_level:
             print ("Video load requested: {:d}".format(n))
 
         # get source name
@@ -75,7 +75,7 @@ class VLCVideoProviderDir(object):
             self.reset_rate_video(n)
 
     def play_video(self, n, load=True, reset_rate=True):
-        if self._verbosity:
+        if self._log_level:
             print ("Video requested: {:d}".format(n))
         # load_media
         if load:
@@ -83,7 +83,7 @@ class VLCVideoProviderDir(object):
         # start playing video
         self.media_player.play()
 
-        if self._verbosity >= 2:
+        if self._log_level >= 2:
             print ("Started video: {:d}".format(n))
 
     def change_rate_video(self, n):
@@ -98,12 +98,12 @@ class VLCVideoProviderDir(object):
         # update current rate
         self._current_rate = n
 
-        if self._verbosity:
+        if self._log_level:
             print ("Rate changed from {:f} to: {:f}".format(rate, new_rate))
 
     def reset_rate_video(self, n):
         reset_rate = 1.0
-        if self._verbosity:
+        if self._log_level:
             rate = self.media_player.get_rate()
             print ("Video rate reset requested: rate was {:f}".format(rate))
         self.media_player.set_rate(reset_rate)
@@ -111,7 +111,7 @@ class VLCVideoProviderDir(object):
         self._current_rate = reset_rate
 
     def rewind_video(self, n):
-        if self._verbosity:
+        if self._log_level:
             print ("Video rewind requested {:d}".format(n))
 
         # only rewind when value is zero
@@ -129,7 +129,7 @@ class VLCVideoProviderDir(object):
             self.play_video(self._current_video, load=load, reset_rate=reset_rate)
 
     def pause_video(self, n):
-        if self._verbosity:
+        if self._log_level:
             if self.media_player.is_playing():
                 print ("Video pause requested {:d}".format(n))
             else:
@@ -137,6 +137,6 @@ class VLCVideoProviderDir(object):
         self.media_player.pause()
 
     def resume_video(self, n):
-        if self._verbosity:
+        if self._log_level:
             print ("Video resume requested {:d}".format(n))
         self.media_player.play()

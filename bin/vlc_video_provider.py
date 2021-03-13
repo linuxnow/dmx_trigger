@@ -32,13 +32,14 @@ def parse_args():
     parser.add_argument(
             "-u", "--universe",
             type=int, default=1,
-            help="Universe number).")
+            help="Universe number")
     parser.add_argument(
             '--extension',
-            default='ts',
+            default='mkv',
             help="file extension of the files to play")
-    parser.add_argument("-v", "--verbosity", action="count",default=0,
-           help="increase output verbosity")
+    parser.add_argument("-l", "--log_level",
+            type=int, default=1,
+            help="log_level")
     return(parser.parse_args())
 
 def main():
@@ -47,10 +48,10 @@ def main():
     args = parse_args()
 
     # setup the video provider
-    video_provider = VLCVideoProviderDir(args.media_folder, verbosity=args.verbosity)
+    video_provider = VLCVideoProviderDir(args.media_folder, log_level=args.log_level)
 
     # listen for DMX512 values in the specified universe
-    dmx_monitor = DMX512Monitor(args.universe, DMX_CALLBACK, video_provider, verbosity=args.verbosity)
+    dmx_monitor = DMX512Monitor(args.universe, DMX_CALLBACK, video_provider, log_level=args.log_level)
     dmx_monitor.run()
 
 
