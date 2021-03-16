@@ -18,4 +18,4 @@ ExecStopPost=-bash -c '[[ $EXIT_STATUS == 0 ]] && notify-send "dmx_trigger servi
 ExecStopPost=-bash -c '[[ $EXIT_STATUS != 0 ]] && notify-send "dmx_trigger service finished abnormally."'
 
 [Install]
-WantedBy=default.target
+WantedBy=default.target olad.service

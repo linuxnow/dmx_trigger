@@ -1,0 +1,21 @@
+[Unit]
+Description=olad server
+After=syslog.target network.target multi-user.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/ola/olad.conf
+
+Environment=ICON=/usr/share/icons/Adwaita/scalable/apps/preferences-system-network-symbolic.svg
+
+ExecStartPre=notify-send "Starting olad service."
+
+ExecStart=olad -c $CONFIG_DIR -l $LOG_LEVEL
+Restart=always
+RestartSec=3
+
+ExecStopPost=-bash -c '[[ $EXIT_STATUS == 0 ]] && notify-send "olad service finished successfully."'
+ExecStopPost=-bash -c '[[ $EXIT_STATUS != 0 ]] && notify-send "olad service finished abnormally."'
+
+[Install]
+WantedBy=default.target
