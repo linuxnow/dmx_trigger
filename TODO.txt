@@ -1,5 +1,11 @@
 TODO
 ----
--logging
--setup
--daemon
+-logging: done
+-setup: done
+-daemon: done via systemd
+-fix slow rewind: done
+
+-Move source to src
+-Upload to github
+-Improve python packaging
+-Create deb file

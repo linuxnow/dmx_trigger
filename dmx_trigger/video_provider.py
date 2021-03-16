@@ -120,16 +120,21 @@ class VLCVideoProviderDir(object):
 
         # only rewind when value is zero
         if n == 0:
+            """
             if self.media_player.get_state() != vlc.State.Ended:
                 self.media_player.set_position(0)
                 load = False
                 # if video hasn't ended, keep rate
-                reset_rate=False
+                reset_rate = False
             else:
                 # reload video when finished as set_position does not work
                 load = True
                 # if video hss ended, reset rate
-                reset_rate=True
+                reset_rate = True
+            """
+            # It's *much* faster to always load, so we do it unconditionally
+            # In slow systems like RPi it could take several seconds
+            load = reset_rate = True
             self.play_video(self._current_video, load=load, reset_rate=reset_rate)
 
     def pause_video(self, n, current=None):
