@@ -3,6 +3,9 @@ from logging.handlers import QueueHandler, QueueListener
 from multiprocessing import Queue
 import atexit
 
+# author
+# https://rob-blackbourn.medium.com/how-to-use-python-logging-queuehandler-with-dictconfig-1e8b1284e27a
+
 
 def _resolve_handlers(l):
     if not isinstance(l, ConvertingList):

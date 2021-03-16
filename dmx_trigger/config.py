@@ -34,7 +34,7 @@ def load_config(filename, section=None):
     :rtype: dict
     """
     try:
-        config = yaml.load(open(filename), Loader=yaml.FullLoader)
+        config = yaml.load(open(filename), Loader=yaml.SafeLoader)
     except IOError as e:
         raise Exception("non-existing config file '%s'" % filename)
     except yaml.YAMLError as e:

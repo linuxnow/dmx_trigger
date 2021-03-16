@@ -113,7 +113,7 @@ class VLCVideoProviderDir(object):
     def rewind_video(self, n, current=None):
         # ignore initial rewind
         if current is None:
-            logger.debug("Initial rewaind ignored.")
+            logger.debug("Initial rewind ignored.")
             return
 
         logger.info("Video rewind requested {:d}".format(n))
