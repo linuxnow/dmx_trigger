@@ -39,7 +39,7 @@ LOGGER = "dmx_trigger"
 
 def parse_args():
     parser = argparse.ArgumentParser(
-            description="Make files found in specified media folder (in alphabetic order) available to the specified universe.",
+            description="Make files found in specified media config available to the specified universe.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--config", dest="config_file",
             help="the configuration file",
@@ -51,9 +51,6 @@ def parse_args():
             help="the media config file",
             default=(os.environ.get("DMX_TRIGGER_MEDIA") or
             "~/.config/media_list.yaml"))
-    parser.add_argument(
-            "media_folder",
-            help="Where to find files to play")
     parser.add_argument(
             "-u", "--universe",
             type=int, default=1,
@@ -87,7 +84,7 @@ def main():
     # settings.update(config)
 
     # setup the video provider
-    video_provider = VLCVideoProviderDir(args.media_folder, media_config=media_config)
+    video_provider = VLCVideoProviderDir(media_config=media_config)
 
     # listen for DMX512 values in the specified universe
     dmx_monitor = DMX512Monitor(args.universe, DMX_CALLBACK, video_provider)

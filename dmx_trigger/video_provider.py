@@ -22,9 +22,7 @@ DEFAULT_RATE=1.0
 DELTA_RATE=0.05
 
 class VLCVideoProviderDir(object):
-    def __init__(self, rootpath, media_config=None, file_ext=valid_extensions, volume=0):
-        self._media_files = []
-        self._rootpath = rootpath
+    def __init__(self, media_config=None, file_ext=valid_extensions, volume=0):
         self._media_config = media_config
         self._playlist = media_config['playlist']
         self._file_ext = file_ext
@@ -42,11 +40,9 @@ class VLCVideoProviderDir(object):
         self.media_player.set_fullscreen(True)
         self.media_player.audio_set_volume(self._volume)
 
-        # read file list
+        # read media file config
         if self._media_config:
             self._check_files_from_config()
-        else:
-            self._load_files_from_dir()
 
     def _get_filename(self, n, scene=0):
         """Get the full path filename.
@@ -91,21 +87,6 @@ class VLCVideoProviderDir(object):
                         logger.warn("File {} in pos {}.{} does not have a valid extension".format(file, p, idx))
                 else:
                     logger.warn("File {} in pos {}.{} does not exist".format(file, p, idx))
-
-    def _load_files_from_dir(self):
-        """
-        This function is responsible of loading the media list.
-
-        In this case it scan the specified folder, but it could also scan a
-        remote url or whatever you prefer.
-        """
-        logger.debug("Load file list from dir")
-        self._media_files = [f for f in os.listdir(self._rootpath) if os.path.splitext(f)[1] in self._file_ext]
-        self._media_files.sort()
-
-        logger.debug("playlist:")
-        for index, media_file in enumerate(self._media_files):
-            logger.debug("{}: {}".format(index, media_file))
 
     def _load_media(self, file, reset_rate=True):
         """Loads media
