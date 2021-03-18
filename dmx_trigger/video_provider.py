@@ -18,15 +18,23 @@ import vlc
 logger = logging.getLogger(__name__)
 
 valid_extensions = [".avi", ".gif", ".mkv", ".mov", ".mp4", ".jpg", ".jpeg", ".png"]
-RATE_DELTA=0.05
+DEFAULT_RATE=1.0
+DELTA_RATE=0.05
 
 class VLCVideoProviderDir(object):
-    def __init__(self, rootpath, file_ext=valid_extensions, volume=0):
+    def __init__(self, rootpath, media_config=None, file_ext=valid_extensions, volume=0):
         self._media_files = []
         self._rootpath = rootpath
+        self._media_config = media_config
+        self._playlist = media_config['playlist']
         self._file_ext = file_ext
-        self._current_video = 0
-        self._current_rate = 1
+        self.current_theme = None
+        self.requested_theme = 0
+        self.current_scenee = None
+        self.requested_scene = 0
+        self.current_rate = self.requested_rate = 0
+        self.requested_reset_rate = False
+        self._rewind = False
         self._volume = volume
 
         # vlc player
@@ -34,19 +42,64 @@ class VLCVideoProviderDir(object):
         self.media_player.set_fullscreen(True)
         self.media_player.audio_set_volume(self._volume)
 
-        # read files from dir
-        self.load_files()
+        # read file list
+        if self._media_config:
+            self._check_files_from_config()
+        else:
+            self._load_files_from_dir()
 
-    def load_files(self):
+    def _get_filename(self, n, scene=0):
+        """Get the full path filename.
+
+        :param int n: theme number
+        :param int scene: scene number
+        :rtype str
         """
-        this function is responsible of opening the media.
-        it could have been done in the __init__, but it is just an example
+        logger.debug("Get filename in position {}.{}".format(n, scene))
+        try:
+            dir = self._playlist[n]['dir']
+            files = self._playlist[n]['files']
+        except KeyError:
+            msg = "No 'dirs' or 'files' section in position {}.{}".format(n, scene)
+            logger.warn(msg)
+            raise Exception(msg)
+        try:
+            f = files[scene]
+        except IndexError:
+            msg = "No file in position {}.{}".format(n, scene)
+            logger.warn(msg)
+            raise Exception(msg)
+        file = os.path.join(dir, f)
+        logger.debug("File {} in pos {}.{}".format(file, n, scene))
+        return file
 
-        in this case it scan the specified folder, but it could also scan a
+    def _check_files_from_config(self):
+        """
+        This function is responsible for checking the media list.
+
+        IT reads a yaml configuration file.
+        """
+        logger.debug("Check load file list from config")
+        for p in self._playlist:
+            dir = self._playlist[p]['dir']
+            files = self._playlist[p]['files']
+            for (idx, f) in enumerate(files):
+                file = os.path.join(dir, f)
+                if os.path.isfile(file):
+                    logger.debug("File {} in pos {}.{} exists".format(file, p, idx))
+                    if os.path.splitext(f)[1] not in self._file_ext:
+                        logger.warn("File {} in pos {}.{} does not have a valid extension".format(file, p, idx))
+                else:
+                    logger.warn("File {} in pos {}.{} does not exist".format(file, p, idx))
+
+    def _load_files_from_dir(self):
+        """
+        This function is responsible of loading the media list.
+
+        In this case it scan the specified folder, but it could also scan a
         remote url or whatever you prefer.
         """
-
-        logger.debug("read file list")
+        logger.debug("Load file list from dir")
         self._media_files = [f for f in os.listdir(self._rootpath) if os.path.splitext(f)[1] in self._file_ext]
         self._media_files.sort()
 
@@ -54,101 +107,164 @@ class VLCVideoProviderDir(object):
         for index, media_file in enumerate(self._media_files):
             logger.debug("{}: {}".format(index, media_file))
 
-    def _load_media(self, n, reset_rate=True):
-        logger.debug("Video load requested: {:d}".format(n))
+    def _load_media(self, file, reset_rate=True):
+        """Loads media
 
-        # get source name
-        try:
-            source = os.path.join(self._rootpath, self._media_files[n])
-        except IndexError:
-            logger.warning("Video not found in position: {:d}".format(n))
-            return
+        Loads the requested media.
+
+        Returns True if all could be executted successfully, False otherwise.
+
+        :rtype bool
+        """
+        logger.debug("Video load requested: {}".format(file))
+
+        # check that file exists
+        if not os.path.isfile(file):
+            logger.warning("Video not found: {}".format(file))
+            return False
 
         # create a media object
-        media = vlc.Media(source)
+        media = vlc.Media(file)
         # set media to the media player
         self.media_player.set_media(media)
-        # update current video
-        self._current_video = n
-        # reset rate
-        if reset_rate:
-            self.reset_rate_video(n)
+        return True
 
-    def play_video(self, n, current=None, load=True, reset_rate=True):
-        logger.info("Video requested: {:d}".format(n))
+    def _play_media(self):
+        """Play media unconditionally.
+
+        Loads and plays the requested media, resetting all the properties that
+        need not be ececuted.
+
+        Returns True if all could be executted successfully, False otherwise.
+
+        :rtype bool
+        """
+        logger.debug("Media play requested: {}.{}".format(self.requested_theme, self.requested_scene))
+        try:
+            file = self._get_filename(self.requested_theme, scene=self.requested_scene)
+        except:
+            msg = "Error getting file name in position {}.{}".format(self.requested_theme, self.requested_scene)
+            logger.error(msg)
+            return False
         # load_media
-        if load:
-            self._load_media(n, reset_rate)
-        # start playing video
-        self.media_player.play()
+        if self._load_media(file):
+            # update current video
+            self.current_theme = self.requested_theme
+            self.current_scenee = self.requested_scene
+            self.current_rate = self.requested_rate
+            self._rewind = False
+            # reset rate
+            self.media_player.set_rate(DEFAULT_RATE)
+            # start playing video
+            logger.debug("Play video {} in position {}.{}".format(file, self.requested_theme, self.requested_scene))
+            self.media_player.play()
+            return True
+        else:
+            logger.debug("Could not start video {} in position {}.{}".format(file, self.requested_theme, self.requested_scene))
+            return False
 
-        logger.debug("Started video:: {:d}".format(n))
-
-    def change_rate_video(self, n, current=None):
-        # ignore initial rate change
-        if current is None:
-            logger.debug("Initial rate change ignored.")
-            return
-
+    def _change_delta_rate(self):
+        """Execute the delta rate change.
+        """
+        logger.debug("Change delta rate")
         new_rate = rate = self.media_player.get_rate()
-
         # change rate
-        if self._current_rate > n:
-            new_rate = rate - RATE_DELTA
-        elif self._current_rate < n:
-            new_rate = rate + RATE_DELTA
+        if self.current_rate > self.requested_rate:
+            new_rate = rate - DELTA_RATE
+        elif self.current_rate < self.requested_rate:
+            new_rate = rate + DELTA_RATE
         self.media_player.set_rate(new_rate)
         # update current rate
-        self._current_rate = n
+        self.current_rate = self.requested_rate
 
-        logger.info("Rate changed from {:f} to: {:f}".format(rate, new_rate))
+        logger.info("Delta rate changed from {:f} to: {:f}".format(rate, new_rate))
 
-    def reset_rate_video(self, n, current=None):
-        reset_rate = 1.0
-        logger.info("Video rate reset requested: rate was {:f}".format(self.media_player.get_rate()))
-        self.media_player.set_rate(reset_rate)
-        # update current rate
-        self._current_rate = reset_rate
+    def exec_pending(self):
+        """Execute the pending actions.
 
-    def rewind_video(self, n, current=None):
-        # ignore initial rewind
-        if current is None:
-            logger.debug("Initial rewind ignored.")
-            return
+        Returns True if all could be executted successfully, False otherwise.
 
+        :rtype bool
+        """
+        logger.info("Execute pending actions")
+        # check for new thene and scene or rewind
+        if (self.requested_theme != self.current_theme or
+            self.requested_scene != self.current_scenee):
+            return self._play_media()
+         # check for rewind
+        elif self._rewind:
+            return self._play_media()
+        # check for rate reset
+        elif self.requested_reset_rate:
+            # update current rate
+            self.media_player.set_rate(DEFAULT_RATE)
+            self.requested_reset_rate = False
+        # check for rate change
+        elif self.requested_rate != self.current_rate:
+            self._change_delta_rate()
+        return True
+
+    def set_theme(self, n, current=None):
+        """Set the requested theme.
+
+        Theme and scxene define the media to play.
+
+        :param int n: theme number
+        """
+        logger.info("Theme requested: {:d}".format(n))
+        self.requested_theme = n
+
+    def set_scene(self, n, current=None):
+        """Set the requested scene.
+
+        Theme and scxene define the media to play.
+
+        :param int n: scene number
+        """
+        logger.info("Scene requested: {:d}".format(n))
+        self.requested_scene = n
+
+    def change_delta_rate(self, n, current=None):
+        """Change delta rate.
+
+        When n increases, increase play rate by DELTA_RATE.
+        When n decreases, decrease play rate by DELTA_RATE.
+
+        :param int n: rate
+        """
+        logger.info("Delta rate change requested: {:d}".format(n))
+        self.requested_rate = n
+
+    def reset_rate(self, n, current=None):
+        """Reset rate.
+
+        Set play rate to default.
+
+        :param int n: rate
+        """
+        logger.info("Rate reset requested: {:d}".format(n))
+        self.requested_reset_rate = True
+
+    def rewind(self, n, current=None):
+        """Rewind media.
+
+        Rewind only when value changes to 0.
+
+        :param int n: value
+        """
         logger.info("Video rewind requested {:d}".format(n))
 
         # only rewind when value is zero
         if n == 0:
-            """
-            if self.media_player.get_state() != vlc.State.Ended:
-                self.media_player.set_position(0)
-                load = False
-                # if video hasn't ended, keep rate
-                reset_rate = False
-            else:
-                # reload video when finished as set_position does not work
-                load = True
-                # if video hss ended, reset rate
-                reset_rate = True
-            """
-            # It's *much* faster to always load, so we do it unconditionally
-            # In slow systems like RPi it could take several seconds
-            load = reset_rate = True
-            self.play_video(self._current_video, load=load, reset_rate=reset_rate)
+            self._rewind = 1
 
-    def pause_video(self, n, current=None):
-        # ignore initial pause
-        if current is None:
-            logger.debug("Initial pause ignored.")
-            return
-
+    def pause(self, n, current=None):
         if self.media_player.is_playing():
             logger.info("Video pause requested {:d}".format(n))
         else:
             logger.info("Video unpause requested {:d}".format(n))
         self.media_player.pause()
 
-    def resume_video(self, n, current=None):
+    def resume(self, n, current=None):
         logger.info("Video resume requested {:d}".format(n))
         self.media_player.play()

@@ -2,16 +2,21 @@
 # -*- coding: utf-8 -*-
 
 """
-Create a playlist with videos from a folder sorted alphabetically.
-Then receive DMX data to control the video play.
+DMX controlled Media Server.
+
+* Configure a numbered playlist with:
+  -a config file
+  -listing and sorting a directory
+* Then receive DMX data to control the video play.
 
 We receive an array of DMX channel values (max 512)
-Channel 0: video number
-Channel 1: faster/slower
-Channel 2: reset rate
-Channel 3: rewind (if value is zero)
-Channel 4: pause/unpause
-Channel 5: resume
+Channel 0: theme number
+Channel 1: theme's scene number
+Channel 2: faster/slower
+Channel 3: reset rate
+Channel 4: rewind (if value is zero)
+Channel 5: pause/unpause
+Channel 6: resume
 """
 
 __author__ = "Pau Aliagas <linuxnow@gmail.com>"
@@ -42,6 +47,10 @@ def parse_args():
             "~/.config/dmx_trigger.yaml"))
     parser.add_argument("--logger", dest="logger",
             help="optional logger name (defaults to %s)" % LOGGER)
+    parser.add_argument("--media", dest="media_file",
+            help="the media config file",
+            default=(os.environ.get("DMX_TRIGGER_MEDIA") or
+            "~/.config/media_list.yaml"))
     parser.add_argument(
             "media_folder",
             help="Where to find files to play")
@@ -69,11 +78,16 @@ def main():
     # always import after configuring logging (load_config does it)
     import logging
 
+    # convert to absolute path before forking to allow user and relative paths
+    media_file = os.path.abspath(os.path.expanduser(args.media_file))
+    # load media config file
+    media_config = load_config(media_file)
+
     # update settings with config params
     # settings.update(config)
 
     # setup the video provider
-    video_provider = VLCVideoProviderDir(args.media_folder)
+    video_provider = VLCVideoProviderDir(args.media_folder, media_config=media_config)
 
     # listen for DMX512 values in the specified universe
     dmx_monitor = DMX512Monitor(args.universe, DMX_CALLBACK, video_provider)

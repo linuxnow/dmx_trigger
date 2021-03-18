@@ -1,0 +1,118 @@
+---
+dirs:
+  dirc: &dirc
+    # dir concert
+    dir: /home/pau/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020/pi_encoded
+  dirb: &dirb
+    # dir ball
+    dir: /home/pau/Documents/metropol/multimedia/videos_pantalla/videos_ball-2020/pi_encoded
+  dirm: &dirm
+    # dir metropol
+    dir: /home/pau/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020
+
+playlist:
+  0:
+    <<: *dirm
+    name: 'Metropol'
+    files:
+      - logo-3D-fons-negre-cam1-5s.mkv
+      - logo-3D-fons-negre-cam1-15s.mkv
+      - logo-3D-fons-negre-cam2-4s.mkv
+      - logo-3D-fons-negre-cam2-15s.mkv
+      - xarxes_socials.png
+  2:
+    <<: *dirb
+    name: 'Leroy Brown'
+    files: [metropol-002-Leroy_Brown.mkv]
+  3:
+    <<: *dirb
+    name: 'Something Stupid'
+    files: [metropol-003-01-Something_Stupid.mkv]
+  5:
+    <<: *dirb
+    name: 'Sway'
+    files: [metropol-005-02-Sway-Rita_Rayworth.mkv]
+  6:
+    <<: *dirb
+    name: 'La Foule'
+    files: [metropol-006-La_Foule-round_background.mkv]
+  126:
+    <<: *dirb
+    name: 'Proud Mary'
+    files:
+      - metropol-126-01-Proud_Mary-pink_purple_particles.mkv
+      - metropol-126-02-Proud_Mary-color_lights_tunnel-600s.mkv
+  201:
+    <<: *dirc
+    name: 'Carmina Burana'
+    files: [metropol-001-Carmina Burana.mkv]
+  202:
+    <<: *dirc
+    name: 'Granada'
+    files: [metropol-002-Granada.mkv]
+  203:
+    <<: *dirc
+    name: 'Les Oiseaux dans la Charmille'
+    files: [metropol-003-Les_Oiseaux.mkv]
+  204:
+    <<: *dirc
+    name: 'Carusso'
+    files: [metropol-004-Una_Furtiva_Lacrima.mkv]
+  205:
+    <<: *dirc
+    name: 'La Vida es Bella'
+    files: [metropol-006-La_Vida_es_Bella.mkv]
+  206:
+    <<: *dirc
+    name: 'Sardanes Viladesau'
+    files:
+      - metropol-007-01-Viladesau-zoom.mkv
+      - metropol-007-02-Viladesau-princep.mkv
+  207:
+    <<: *dirc
+    name: 'Bandes Sonores'
+    files:
+      - metropol-008-01-La_Missio.mkv
+      - metropol-008-02-Gladiator-blat.mkv
+      - metropol-008-03-Gladiator-escenes.mkv
+      - metropol-008-04-Braveheart-discurs.mkv
+      - metropol-008-05-Pirates_del_Carib__tempesta.mkv
+      - metropol-008-06-Pirates_del_Carib__perla_negra-endeavour.mkv
+  208:
+    <<: *dirc
+    name: "L'Emigrant"
+    files: [metropol-010-Emigrant.mkv]
+  209:
+    <<: *dirc
+    name: 'País Petit'
+    files: [metropol-009-Pais_Petit.mkv]
+  210:
+    <<: *dirc
+    name: 'Pirineu'
+    files: [metropol-011-Pirineu.mkv]
+  211:
+    <<: *dirc
+    name: 'En el Vallespir'
+    files: [metropol-012-Vallespir.mkv]
+  212:
+    <<: *dirc
+    name: 'Barcelona'
+    files:
+      - metropol-013-01-Barcelona-pebeter.mkv
+      - metropol-013-02-Barcelona-freddy_caballe.mkv
+  213:
+    <<: *dirc
+    name: 'Cant dse la Senyera'
+    files: [metropol-014-senyera_onejant-1200s.mkv]
+  214:
+    <<: *dirc
+    name: 'La Santa Espina'
+    files: [metropol-014-senyera_onejant-1200s.mkv]
+  215:
+    <<: *dirc
+    name: "Girona m'Enamora"
+    files: [metropol-014-senyera_onejant-1200s.mkv]
+  224:
+    <<: *dirc
+    name: 'The Prayer'
+    files: [metropol-005-The_Prayer.mkv]
