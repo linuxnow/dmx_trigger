@@ -73,7 +73,7 @@ def load_config(filename, section=None):
             # load yaml logconfig file 1st, then old ini format
             logfile = loggers.get('file')
             try:
-                logconfig = yaml.load(open(logfile))
+                logconfig = yaml.load(open(logfile), Loader=yaml.SafeLoader)
             except yaml.YAMLError as e:
                 # try old ini format
                 logconfig = None
