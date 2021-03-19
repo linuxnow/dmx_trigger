@@ -10,7 +10,7 @@ Environment=ICON=/usr/share/icons/Adwaita/scalable/mimetypes/video-x-generic-sym
 
 ExecStartPre=notify-send "Starting dmx_trigger service."
 
-ExecStart=%h/.local/bin/vlc_video_provider.py $MEDIA_DIR -u $UNIVERSE --config $CONFIG_FILE
+ExecStart=%h/.local/bin/vlc_video_provider.py --config $CONFIG_FILE -u $UNIVERSE --media $MEDIA_FILE
 Restart=always
 RestartSec=3
 
