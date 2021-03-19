@@ -2,14 +2,14 @@
 dirs:
   dirc: &dirc
     # dir concert
-    dir: /home/pau/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020/pi_encoded
+    dir: ~/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020/pi_encoded
   dirb: &dirb
     # dir ball
-    dir: /home/pau/Documents/metropol/multimedia/videos_pantalla/videos_ball-2020/pi_encoded
+    dir: ~/Documents/metropol/multimedia/videos_pantalla/videos_ball-2020/pi_encoded
     playmode: 'loop'
   dirm: &dirm
     # dir metropol
-    dir: /home/pau/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020
+    dir: ~/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020
 
 playlist:
   0:

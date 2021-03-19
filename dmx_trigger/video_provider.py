@@ -103,7 +103,8 @@ class VLCVideoProviderDir(object):
             except KeyError:
                 playmode = DEFAULT_PLAYMODE
             for (idx, f) in enumerate(files):
-                file = os.path.join(dir, f)
+                # expand user and convert to absolute path
+                file = os.path.abspath(os.path.expanduser(os.path.join(dir, f)))
                 if os.path.isfile(file):
                     logger.debug("File {} in pos {}.{} exists".format(file, p, idx))
                     if os.path.splitext(f)[1] not in self._file_ext:
