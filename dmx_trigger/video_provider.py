@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 valid_extensions = [".avi", ".gif", ".mkv", ".mov", ".mp4", ".jpg", ".jpeg", ".png"]
 DEFAULT_RATE=1.0
 DELTA_RATE=0.05
+DEFAULT_PLAYMODE="default"
 
 class VLCVideoProviderDir(object):
     def __init__(self, media_config=None, file_ext=valid_extensions, volume=0):
@@ -100,7 +101,7 @@ class VLCVideoProviderDir(object):
             try:
                 playmode = self._playlist[p]["playmode"]
             except KeyError:
-                playmode = False
+                playmode = DEFAULT_PLAYMODE
             for (idx, f) in enumerate(files):
                 file = os.path.join(dir, f)
                 if os.path.isfile(file):
@@ -116,7 +117,7 @@ class VLCVideoProviderDir(object):
                     logger.warn("File {} in pos {}.{} does not exist".format(file, p, idx))
         return vlclist
 
-    def _load_media(self, file, playmode="default"):
+    def _load_media(self, file, playmode=DEFAULT_PLAYMODE):
         """Loads media
 
         Loads the requested media.
@@ -174,7 +175,7 @@ class VLCVideoProviderDir(object):
             logger.debug("Could not start video {} in position {}.{}".format(file, self.requested_theme, self.requested_scene))
             return False
 
-    def _load_medialist(self, file, playmode="default"):
+    def _load_medialist(self, file, playmode=DEFAULT_PLAYMODE):
         """Loads media
 
         Loads the requested media list with a single file.
@@ -193,6 +194,7 @@ class VLCVideoProviderDir(object):
         # create media list with one file
         # first empty list
         i = self.vlc["playlist"].count()
+        self.vlc["playlist"].lock()
         while i:
             self.vlc["playlist"].remove_index(0)
             i -= 1;
@@ -200,6 +202,7 @@ class VLCVideoProviderDir(object):
         media = self.vlc['instance'].media_new(file)
         # add media to the playlist
         self.vlc["playlist"].add_media(media)
+        self.vlc["playlist"].unlock()
         if playmode == "loop":
             self.vlc["list_player"].set_playback_mode(vlc.PlaybackMode.loop)
         elif playmode == "repeat":
@@ -232,12 +235,6 @@ class VLCVideoProviderDir(object):
 
         # load_media
         if self._load_medialist(file, playmode=playmode):
-            """
-            logger.debug("Playing list item {}".format(pos))
-            logger.debug("Ready to play list item {}".format(pos))
-            logger.debug("Media list has {} elements.".format(self.vlc["playlist"].count()))
-            logger.debug("Media item 0: {}".format(self.vlc["playlist"].item_at_index(0)))
-            """
             # update current video
             self.current_theme = self.requested_theme
             self.current_scenee = self.requested_scene
@@ -247,8 +244,8 @@ class VLCVideoProviderDir(object):
             self.vlc["player"].set_rate(DEFAULT_RATE)
             # start playing video
             logger.debug("Play video {} in position {}.{}".format(file, self.requested_theme, self.requested_scene))
-            # we use next as a workaround otherwise the current media keeps plaiying
-            self.vlc["list_player"].next()
+            # we play the file in position 0
+            self.vlc["list_player"].play_item_at_index(0)
             return True
         else:
             logger.debug("Could not start video {} in position {}.{}".format(file, self.requested_theme, self.requested_scene))
