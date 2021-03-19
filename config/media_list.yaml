@@ -6,6 +6,7 @@ dirs:
   dirb: &dirb
     # dir ball
     dir: /home/pau/Documents/metropol/multimedia/videos_pantalla/videos_ball-2020/pi_encoded
+    playmode: 'loop'
   dirm: &dirm
     # dir metropol
     dir: /home/pau/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020
@@ -31,6 +32,7 @@ playlist:
   5:
     <<: *dirb
     name: 'Sway'
+    playmode: 'loop'
     files: [metropol-005-02-Sway-Rita_Rayworth.mkv]
   6:
     <<: *dirb
@@ -103,14 +105,17 @@ playlist:
   213:
     <<: *dirc
     name: 'Cant dse la Senyera'
+    playmode: 'loop'
     files: [metropol-014-senyera_onejant-1200s.mkv]
   214:
     <<: *dirc
     name: 'La Santa Espina'
+    playmode: 'loop'
     files: [metropol-014-senyera_onejant-1200s.mkv]
   215:
     <<: *dirc
     name: "Girona m'Enamora"
+    playmode: 'loop'
     files: [metropol-014-senyera_onejant-1200s.mkv]
   224:
     <<: *dirc
