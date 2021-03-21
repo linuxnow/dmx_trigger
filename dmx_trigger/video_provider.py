@@ -151,6 +151,8 @@ class VLCVideoProviderDir(object):
         :rtype bool
         """
         logger.debug("Media play requested: {}.{}".format(self.requested_theme, self.requested_scene))
+        # forget rewind when asked to play media
+        self._rewind = False
         try:
             file = self._get_filename(self.requested_theme, scene=self.requested_scene)
             playmode = self._vlclist[self.requested_theme, self.requested_scene]["playmode"]
@@ -165,7 +167,6 @@ class VLCVideoProviderDir(object):
             self.current_theme = self.requested_theme
             self.current_scenee = self.requested_scene
             self.current_rate = self.requested_rate
-            self._rewind = False
             # reset rate
             self.vlc["player"].set_rate(DEFAULT_RATE)
             # start playing video
@@ -223,6 +224,8 @@ class VLCVideoProviderDir(object):
 
         :rtype bool
         """
+        # forget rewind when asked to play media
+        self._rewind = False
         logger.debug("Media play requested: {}.{}".format(self.requested_theme, self.requested_scene))
         try:
             pos = self._vlclist[self.requested_theme, self.requested_scene]["pos"]
@@ -240,7 +243,6 @@ class VLCVideoProviderDir(object):
             self.current_theme = self.requested_theme
             self.current_scenee = self.requested_scene
             self.current_rate = self.requested_rate
-            self._rewind = False
             # reset rate
             self.vlc["player"].set_rate(DEFAULT_RATE)
             # start playing video
