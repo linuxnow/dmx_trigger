@@ -2,14 +2,14 @@
 dirs:
   dirc: &dirc
     # dir concert
-    dir: ~/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020/pi_encoded
+    dir: ~/Documents/metropol/multimedia/videos_pantalla/rpi/videos_concert-2021
   dirb: &dirb
     # dir ball
-    dir: ~/Documents/metropol/multimedia/videos_pantalla/videos_ball-2020/pi_encoded
+    dir: ~/Documents/metropol/multimedia/videos_pantalla/rpi/videos_ball-2021
     playmode: 'loop'
   dirm: &dirm
     # dir metropol
-    dir: ~/Documents/metropol/multimedia/videos_pantalla/vídeos_concert-2020
+    dir: ~/Documents/metropol/multimedia/videos_pantalla/rpi/videos_metropol-2021
 
 playlist:
   0:
@@ -74,7 +74,7 @@ playlist:
     <<: *dirc
     name: 'Bandes Sonores'
     files:
-      - metropol-008-01-La_Missio.mkv
+      - metropol-008-01-La_Missio.mp4
       - metropol-008-02-Gladiator-blat.mkv
       - metropol-008-03-Gladiator-escenes.mkv
       - metropol-008-04-Braveheart-discurs.mkv

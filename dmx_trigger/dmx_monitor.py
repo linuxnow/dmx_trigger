@@ -31,11 +31,11 @@ logger = logging.getLogger(__name__)
 # We sort the channels to optimize two things:
 # 1. DMX partial transmission: only updated channels are transmitted
 # 2. program logic: we know that previous channels have been processed
-CHANNEL = {'THEME': 0, 'SCENE': 1, 'RATE': 2, 'RESET': 3, 'REWIND': 4,
-    'PAUSE': 5, 'RESUME': 6}
+CHANNEL = {'THEME': 0, 'SCENE': 1, 'RELEASE': 2, 'RATE': 3, 'RESET': 4, 'REWIND': 5, 'PAUSE': 6, 'RESUME': 7}
 
 DMX_CALLBACK=[ [CHANNEL['THEME'], "set_theme"],
     [CHANNEL['SCENE'], "set_scene"],
+    [CHANNEL['RELEASE'], "release"],
     [CHANNEL['RATE'], "change_delta_rate"],
     [CHANNEL['RESET'], "reset_rate"],
     [CHANNEL['REWIND'], "rewind"],

@@ -35,6 +35,8 @@ class VLCVideoProviderDir(object):
         self.current_rate = self.requested_rate = 0
         self.requested_reset_rate = False
         self._rewind = False
+        self.requested_release = 0
+        self._release = False
         self._volume = volume
         self.vlc = {
             "instance": None,
@@ -277,10 +279,12 @@ class VLCVideoProviderDir(object):
 
         :rtype bool
         """
-        logger.info("Execute pending actions")
-        # check for new thene and scene or rewind
-        if (self.requested_theme != self.current_theme or
-            self.requested_scene != self.current_scenee):
+        logger.info("Execute pending actions: release = {}".format(self._release))
+        # do not consider playing until we have a release
+        # check for new theme and scene or rewind
+        if  (self._release and
+            (self.requested_theme != self.current_theme or
+            self.requested_scene != self.current_scenee)):
             return self._play_medialist()
          # check for rewind
         elif self._rewind:
@@ -294,6 +298,21 @@ class VLCVideoProviderDir(object):
         elif self.requested_rate != self.current_rate:
             self._change_delta_rate()
         return True
+
+    def release(self, n, current=None):
+        """Allow action to be executed.
+
+        When we move from zero to a positive value, we play the video.
+
+        :param int n: value
+        """
+        logger.info("Release requested: {:d}".format(n))
+
+        # When we move from 0 to positive value, it's a release
+        logger.debug("pre: requested_release = {}, release = {}".format(self.requested_release, self._release))
+        self._release = (n > 0)
+        self.requested_release = n
+        logger.debug("post: requested_release = {}, release = {}".format(self.requested_release, self._release))
 
     def set_theme(self, n, current=None):
         """Set the requested theme.

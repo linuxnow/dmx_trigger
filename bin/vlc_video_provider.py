@@ -12,11 +12,12 @@ DMX controlled Media Server.
 We receive an array of DMX channel values (max 512)
 Channel 0: theme number
 Channel 1: theme's scene number
-Channel 2: faster/slower
-Channel 3: reset rate
-Channel 4: rewind (if value is zero)
-Channel 5: pause/unpause
-Channel 6: resume
+Channel 2: release video
+Channel 3: faster/slower
+Channel 4: reset rate
+Channel 5: rewind (if value is zero)
+Channel 6: pause/unpause
+Channel 7: resume
 """
 
 __author__ = "Pau Aliagas <linuxnow@gmail.com>"
