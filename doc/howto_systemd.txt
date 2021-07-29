@@ -24,7 +24,7 @@ systemctl --user start dmx_trigger_concert
 systemctl --user start dmx_trigger_concert
 
 4. Start
-Unit files are configured to be autoamtically started:
+Unit files are configured to be automatically started:
 -olad: when we reach network and multi_user target
 -dmx_trigger_concert when we reach olad and graphic.session
 

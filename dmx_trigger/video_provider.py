@@ -366,7 +366,7 @@ class VLCVideoProviderDir(object):
 
         # only rewind when value is zero
         if n == 0:
-            self._rewind = 1
+            self._rewind = True
 
     def pause(self, n, current=None):
         if self.vlc["player"].is_playing():
