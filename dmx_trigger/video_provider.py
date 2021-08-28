@@ -61,7 +61,9 @@ class VLCVideoProviderDir(object):
             http://www.olivieraubert.net/vlc/python-ctypes/doc/
         """
         # vlc media list player
-        flags = ["--quiet", "--no-audio", "--intf", "--mouse-hide-timeout=0", "--video-on-top", "volume={}".format(self._volume)]
+        flags = self._media_config["vlc"]["flags"]
+        flags.append("volume={}".format(self._volume))
+        logger.debug("vlc flags: {}".format(flags))
         self.vlc["instance"] = vlc.Instance(flags)
         self.vlc['list_player'] = self.vlc['instance'].media_list_player_new()
         self.vlc['player'] = self.vlc['list_player'].get_media_player()

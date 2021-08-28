@@ -1,4 +1,23 @@
 ---
+vlc:
+  flags:
+    - --quiet
+    - --no-audio
+    - --intf
+    - --mouse-hide-timeout=0
+    - --align=0
+    - --autoscale
+    - --custom-aspect-ratios=21:11
+    - --aspect-ratio=21:11
+    # - --custom-crop-ratios=21:11
+    # - --crop=21:11
+    # - --canvas-width=762
+    # - --canvas-height=352
+    # - --canvas-aspect=21:11
+    -  --fullscreen
+    - --monitor-par=30:27
+    - --video-on-top
+
 dirs:
   dirc: &dirc
     # dir concert
