@@ -2,14 +2,14 @@
 dirs:
   dirc: &dirc
     # dir concert
-    dir: ~/Documents/metropol/multimedia/videos_pantalla/rpi/videos_concert-2021
+    dir: ~/Videos/videos_concert-2021
   dirb: &dirb
     # dir ball
-    dir: ~/Documents/metropol/multimedia/videos_pantalla/rpi/videos_ball-2021
+    dir: ~/Videos/videos_ball-2021
     playmode: 'loop'
   dirm: &dirm
     # dir metropol
-    dir: ~/Documents/metropol/multimedia/videos_pantalla/rpi/videos_metropol-2021
+    dir: ~/Videos/videos_metropol-2021
 
 playlist:
   0:
@@ -20,104 +20,398 @@ playlist:
       - logo-3D-fons-negre-cam1-15s.mkv
       - logo-3D-fons-negre-cam2-4s.mkv
       - logo-3D-fons-negre-cam2-15s.mkv
+      - logo-3D-fons-gris-cam1.mkv
+      - logo-3D-fons-gris-cam2.mkv
       - xarxes_socials.png
+      - logo_3D-cam2-on_fire-600s-rpi.mkv
+      - logo-3D-cam1-senyera-600s.mkv
+      - /home/pau/Videos/videos_concert-2021/logo-3D-cam1-senyera-600s.mkv
+  1:
+    <<: *dirm
+    name: 'Birdland'
+    files:
+      - logo-3D-fons-negre-cam2-15s.mkv
+      - logo-3D-fons-negre-cam1-5s.mkv
+      - logo-3D-fons-negre-cam1-15s.mkv
+      - logo-3D-fons-negre-cam2-4s.mkv
   2:
     <<: *dirb
     name: 'Leroy Brown'
-    files: [metropol-002-Leroy_Brown.mkv]
+    files: [002-Leroy_Brown.mkv]
   3:
     <<: *dirb
     name: 'Something Stupid'
-    files: [metropol-003-01-Something_Stupid.mkv]
+    files:
+      - 003-00-Something_Stupid.mkv
+      - 003-01-Something_Stupid.mkv
+  4:
+    <<: *dirb
+    name: 'El Ladrón'
+    files: [004-El Ladrón-blue_spheres-600s.mkv]
   5:
     <<: *dirb
     name: 'Sway'
-    playmode: 'loop'
-    files: [metropol-005-02-Sway-Rita_Rayworth.mkv]
+    files: [005-Sway-Rita_Rayworth.mkv]
   6:
     <<: *dirb
     name: 'La Foule'
-    files: [metropol-006-La_Foule-round_background.mkv]
+    files: [006-La_Foule-round_background.mkv]
+  7:
+    <<: *dirb
+    name: 'La Viajera'
+    files: [007-La_Viajera-neon_lines-600s.mkv]
+  8:
+    <<: *dirb
+    name: 'La Tequilera'
+    files: [008-La_Tequilera-Mexico-285s.mkv]
+  9:
+    <<: *dirb
+    playmode: 'default'
+    name: 'Vivir Así Es Morir de Amor'
+    files: [009-Vivir_Así_Es_Morir_de_Amor.mkv]
+  10:
+    <<: *dirb
+    name: 'Will You Still Love Me Tomnorrow'
+    files: [010-Will_You_Still_Love_Me_Tomorrow-decorated_heart-300s.mkv]
+  11:
+    <<: *dirm
+    name: 'En Er Mundo'
+    playmode: 'loop'
+    files: [logo_3D-fons-hexagons_colors-90s.mkv]
+  13:
+    <<: *dirb
+    name: 'Fly Me To The Moon'
+    files: [013-Fly_Me_To_The_Moon-moon_over_the_clouds.mkv]
+  15:
+    <<: *dirb
+    name: 'Macarenas Mambo'
+    files: [015-Macarena-rotating_stage_golden-300s.mkv]
+  17:
+    <<: *dirb
+    name: 'Delilah'
+    files: [017-01-Delilah-golden_particles.mkv]
+  18:
+    <<: *dirb
+    name: "It's Not Unusual"
+    files: [018-Its_Not_Unusual-color_pillars.mkv]
+  19:
+    <<: *dirb
+    name: 'Bailes de Mexico'
+    files: [019-Bailes_de_Mexico-Mexico-285s.mkv]
+  20:
+    <<: *dirb
+    name: 'Noelia'
+    files: [020-Noelia-glowing_hearts.mkv]
+  21:
+    <<: *dirb
+    name: 'Elisabeth'
+    files: [021-Elisabeth-red_stroked_horizon-600s.mkv]
+  22:
+    <<: *dirb
+    name: 'El Anillo Pa Cuando'
+    files: [022-La_Vacuna_Pa_Cuando-clip_Metropol.mkv]
+  24:
+    <<: *dirb
+    name: 'Eurovison'
+    files: [024-eurovisio_vintage.jpg]
+  26:
+    <<: *dirb
+    name: 'Rumbes'
+    files:
+      - 026-Rumbes-round_backgroud_lights_white-300s.mkv
+      - 049-Gitanitos_y_Morenos-rotating_stage_colors-600s.mkv
+  27:
+    <<: *dirb
+    name: 'Tommy Dorsey && Glenn Miller'
+    files:
+      - 027-00-Tommy_Dorsey.mkv
+      - 027-01-In_the_Mood.mkv
+  28:
+    <<: *dirb
+    name: 'Señora Bonita/Santander'
+    files:
+      - 028-00-Senora_Bonita-purple_confetti-600s.mkv
+      - 028-01-Santander-pink_purple_particles-600s.mkv
+  29:
+    <<: *dirm
+    name: 'Mirando Al Mar'
+    playmode: 'loop'
+    files: [logo_3D-fons-water-3s.mov]
+  31:
+    <<: *dirb
+    name: 'Me lo dijo Adela'
+    files: [028-00-Senora_Bonita-purple_confetti-600s.mkv]
+  32:
+    <<: *dirb
+    name: 'Stand By Me'
+    files: [028-01-Santander-pink_purple_particles-600s.mkv]
+  35:
+    <<: *dirb
+    name: 'Hoy No Me Voy Sin Bailar'
+    files: [035-No_Me_Voy_Sin_Bailar-round_color_tunnel-600s.mkv]
+  37:
+    <<: *dirm
+    name: 'Amigo'
+    playmode: 'loop'
+    files: [logo_3D-fons-hexagons_colors-90s.mkv]
+  38:
+    <<: *dirb
+    name: 'Boom Bang A Bang'
+    files: [038-Boom_Bang_a_Bang-golden_curtain.mkv]
+  39:
+    <<: *dirb
+    name: 'Perdóname'
+    files:
+      - 039-Perdoname-flying_purple_hearts-600s.mkv
+      - 039-Perdoname-glowing_hearts.mkv
+  41:
+    <<: *dirb
+    name: 'La Bella Maria'
+    files: [041-La_Bella_Maria.mkv]
+  43:
+    <<: *dirm
+    name: "Vals de l'Emperador"
+    playmode: 'loop'
+    files: [logo_3D-fons-hexagons_colors-90s.mkv]
+  44:
+    <<: *dirb
+    name: 'Lola La Tavernera'
+    files: [044-Lola_La_Tavernera-light_bulbs-360s.mkv]
+  45:
+    <<: *dirb
+    name: 'La Última Noche'
+    files: [045-La Última Noche-green_vortex_travel-600s.mkv]
+  49:
+    <<: *dirb
+    name: 'Gitanitos Y Morenos'
+    files:
+      - 049-Gitanitos_y_Morenos-rotating_stage_colors-600s.mkv
+      - 026-Rumbes-round_backgroud_lights_white-300s.mkv
+  52:
+    <<: *dirb
+    name: 'Perhaps Perhaps Perhaps'
+    files: [052-Perhaps-new_york_night_drone.mkv]
+  54:
+    <<: *dirm
+    name: 'Medley Romàntic'
+    playmode: 'loop'
+    files: [logo_3D-fons-hexagons_colors-90s.mkv]
+  56:
+    <<: *dirm
+    name: 'Amparito Roca'
+    playmode: 'loop'
+    files: [logo_3D-fons-beams_colors-90s.mkv]
+  58:
+    <<: *dirm
+    name: "I've Got You Under My Skin"
+    playmode: 'loop'
+    files: [logo_3D-fons-hexagons_colors-90s.mkv]
+  67:
+    <<: *dirm
+    name: 'Antònia'
+    playmode: 'loop'
+    files: [logo_3D-fons-beams_colors-90s.mkv]
+  70:
+    <<: *dirm
+    name: 'Vals de Shostakovich'
+    playmode: 'loop'
+    files: [logo_3D-fons-beams_colors-90s.mkv]
+  101:
+    <<: *dirb
+    name: 'Mi Gran Noche'
+    files: [101-Mi_Gran_Noche.mkv]
+  102:
+    <<: *dirb
+    name: 'Sweet Home Alabama'
+    files: [102-Sweet_Home_Alabama-skyscrapers_sunset.mkv]
+  103:
+    <<: *dirb
+    name: 'I Feel Good'
+    files: [103-I_Feel_Good-rotating_stage_purple.mkv]
+  104:
+    <<: *dirb
+    name: 'Highway To Hell'
+    files:
+      - 104-00-Highway_to_Hell-acdc_burning-rpi.mkv
+      - 104-01-Highway_to_Hell-close_flames-360s.mkv
+  105:
+    <<: *dirb
+    name: 'Grease'
+    files:
+      - 105-00-Grease.mkv
+      - 105-01-Grease.mkv
+  106:
+    <<: *dirb
+    name: 'Mix Cuéntame'
+    files:
+      - 007-La_Viajera-neon_lines-600s.mkv
+      - 106-00-Cuentame-star_tunnel-540s.mkv
+      - 028-00-Senora_Bonita-purple_confetti-600s.mkv
+      - 018-Its_Not_Unusual-color_pillars.mkv
+  111:
+    <<: *dirb
+    name: 'Medlay Jarabe de Palo'
+    files:
+      - 111-00-La_Flaca.mkv
+      - 111-01-Eso_Que_Tu_Me_Das.mkv
+  112:
+    <<: *dirm
+    name: 'Boig Per Tu'
+    playmode: 'loop'
+    files: [logo_3D-fons-hexagons_colors-90s.mkv]
+  114:
+    <<: *dirm
+    name: "La Foguera"
+    playmode: 'loop'
+    files: [logo_3D-cam2-on_fire-600s-rpi.mkv]
+  119:
+    <<: *dirm
+    name: "L'Estaca"
+    playmode: 'loop'
+    files:
+      - logo_3D-fons-burning_plasma-90s.mkv
+      - logo_3D-cam2-on_fire-600s-rpi.mkv
+  120:
+    <<: *dirb
+    name: "The Best"
+    files:
+      - 123-Valerie-smooth_purple_black_hole-600s.mkv
+  121:
+    <<: *dirb
+    name: 'The Final Countdown'
+    files: [121-The_Final_Countdown-blue_pulsing_light_tunnel.mkv]
+  122:
+    <<: *dirb
+    name: 'Village People'
+    files:
+      - 122-Village_People-round_yellow_tunnel-1200s.mkv
+  123:
+    <<: *dirb
+    name: 'Valerie'
+    files:
+      - 123-Valerie-smooth_purple_black_hole-600s.mkv
+  124:
+    <<: *dirb
+    name: "Can't Take My Eyes off You"
+    files: [123-Valerie-smooth_purple_black_hole-600s.mkv]
   126:
     <<: *dirb
     name: 'Proud Mary'
     files:
-      - metropol-126-01-Proud_Mary-pink_purple_particles.mkv
-      - metropol-126-02-Proud_Mary-color_lights_tunnel-600s.mkv
+      - 126-00-Proud_Mary-purple_dust_gradient-600s.mkv
+      - 126-01-Proud_Mary-color_lights_tunnel-600s.mkv
+  127:
+    <<: *dirm
+    name: 'Medley Català 2021'
+    playmode: 'loop'
+    files:
+      - logo_3D-fons-hexagons_colors-90s.mkv
+      - logo_3D-fons-burning_plasma-90s.mkv
+      - logo_3D-fons-beams_colors-90s.mkv
+  128:
+    <<: *dirm
+    name: 'Medley Txarango'
+    playmode: 'loop'
+    files:
+      - logo_3D-fons-burning_plasma-90s.mkv
+      - logo_3D-fons-beams_colors-90s.mkv
+  129:
+    <<: *dirm
+    name: 'Medley Català Bon Dia i Empordà'
+    playmode: 'loop'
+    files:
+      - logo_3D-fons-burning_plasma-90s.mkv
+      - logo_3D-fons-beams_colors-90s.mkv
+  130:
+    <<: *dirm
+    name: "L'Estaca"
+    playmode: 'loop'
+    files:
+      - logo_3D-fons-burning_plasma-90s.mkv
   201:
     <<: *dirc
     name: 'Carmina Burana'
-    files: [metropol-001-Carmina Burana.mkv]
+    files: [201-Carmina Burana.mkv]
   202:
     <<: *dirc
     name: 'Granada'
-    files: [metropol-002-Granada.mkv]
+    files: [202-Granada.mkv]
   203:
     <<: *dirc
     name: 'Les Oiseaux dans la Charmille'
-    files: [metropol-003-Les_Oiseaux.mkv]
+    files: [203-Les_Oiseaux.mkv]
   204:
     <<: *dirc
     name: 'Carusso'
-    files: [metropol-004-Una_Furtiva_Lacrima.mkv]
+    files: [204-Una_Furtiva_Lacrima.mkv]
   205:
     <<: *dirc
     name: 'La Vida es Bella'
-    files: [metropol-006-La_Vida_es_Bella.mkv]
+    files: [206-La_Vida_es_Bella.mkv]
   206:
     <<: *dirc
     name: 'Sardanes Viladesau'
     files:
-      - metropol-007-01-Viladesau-zoom.mkv
-      - metropol-007-02-Viladesau-princep.mkv
+      - 207-00-Viladesau-zoom.mkv
+      - 207-01-Viladesau-princep.mkv
   207:
     <<: *dirc
     name: 'Bandes Sonores'
     files:
-      - metropol-008-01-La_Missio.mp4
-      - metropol-008-02-Gladiator-blat.mkv
-      - metropol-008-03-Gladiator-escenes.mkv
-      - metropol-008-04-Braveheart-discurs.mkv
-      - metropol-008-05-Pirates_del_Carib__tempesta.mkv
-      - metropol-008-06-Pirates_del_Carib__perla_negra-endeavour.mkv
+      - 208-00-La_Missio.mp4
+      - 208-01-Gladiator-blat.mkv
+      - 208-02-Gladiator-escenes.mkv
+      - 208-03-Braveheart-discurs.mkv
+      - 208-04-Pirates_del_Carib__tempesta.mkv
+      - 208-05-Pirates_del_Carib__perla_negra-endeavour.mkv
   208:
     <<: *dirc
     name: "L'Emigrant"
-    files: [metropol-010-Emigrant.mkv]
+    playmode: 'loop'
+    files:
+      - logo-3D-cam1-senyera-600s.mkv
+      - 210-Emigrant.mkv
   209:
     <<: *dirc
     name: 'País Petit'
-    files: [metropol-009-Pais_Petit.mkv]
+    files: [209-Pais_Petit.mkv]
   210:
     <<: *dirc
     name: 'Pirineu'
-    files: [metropol-011-Pirineu.mkv]
+    files: [211-Pirineu.mkv]
   211:
     <<: *dirc
     name: 'En el Vallespir'
-    files: [metropol-012-Vallespir.mkv]
+    files: [212-Vallespir.mkv]
   212:
     <<: *dirc
     name: 'Barcelona'
     files:
-      - metropol-013-01-Barcelona-pebeter.mkv
-      - metropol-013-02-Barcelona-freddy_caballe.mkv
+      - 213-00-Barcelona-pebeter.mkv
+      - 213-01-Barcelona-freddy_caballe.mkv
   213:
     <<: *dirc
-    name: 'Cant dse la Senyera'
+    name: 'Cant de la Senyera'
     playmode: 'loop'
-    files: [metropol-014-senyera_onejant-1200s.mkv]
+    files: [214-senyera_onejant-1200s.mkv]
   214:
     <<: *dirc
     name: 'La Santa Espina'
     playmode: 'loop'
-    files: [metropol-014-senyera_onejant-1200s.mkv]
+    files: [logo-3D-cam1-senyera-600s.mkv]
   215:
     <<: *dirc
     name: "Girona m'Enamora"
     playmode: 'loop'
-    files: [metropol-014-senyera_onejant-1200s.mkv]
+    files: [214-senyera_onejant-1200s.mkv]
+  216:
+    <<: *dirc
+    name: 'Sardana Golmés'
+    playmode: 'loop'
+    files:
+      - 216-00-Golmés.mkv
+      - 216-01-Golmés_Metropol.mkv
   224:
     <<: *dirc
     name: 'The Prayer'
-    files: [metropol-005-The_Prayer.mkv]
+    files: [224-The_Prayer.mkv]

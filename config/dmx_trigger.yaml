@@ -49,9 +49,5 @@ loggers:
 # we can also embed the loggers configuration in this file
 # loggers:
 
-# We read the media list from a separate file
-# media:
-#     file: "~/.config/dmx_trigger/media_list.yaml"
-
 # default values
-universe: 0
+universe: 5
